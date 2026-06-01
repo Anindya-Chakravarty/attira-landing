@@ -1,0 +1,20 @@
+{
+  "name": "attira-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Attira landing site + waitlist email capture",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "export": "node export-emails.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1"
+  }
+}

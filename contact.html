@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Attira</title>
+  <meta name="description" content="Need help with Attira? Send us your issue and we'll get back to you, or email attirapp@gmail.com directly." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===================== HEADER / NAV ===================== -->
+  <header class="nav" id="top">
+    <a href="index.html#top" class="nav__logo">ATTIRA</a>
+
+    <nav class="nav__links" id="navLinks">
+      <a href="index.html#about">About</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#waitlist" class="nav__cta">Join Waitlist</a>
+    </nav>
+
+    <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ===================== CONTACT ===================== -->
+  <main class="legal">
+    <section class="legal__hero">
+      <div class="legal__hero-inner">
+        <p class="legal__eyebrow">Support</p>
+        <h1 class="legal__title">We're here to <em>help</em></h1>
+        <p class="legal__intro">
+          Tell us what's going wrong and we'll get back to you. Or email us directly.
+        </p>
+      </div>
+    </section>
+
+    <section class="legal__body">
+      <div class="contact">
+        <form class="contact__form"
+              action="mailto:attirapp@gmail.com"
+              method="post"
+              enctype="text/plain">
+          <div class="contact__field">
+            <label for="contact-email">Your email</label>
+            <input id="contact-email" name="Email" type="email" required
+                   autocomplete="email" placeholder="you@example.com" />
+          </div>
+
+          <div class="contact__field">
+            <label for="contact-issue">Describe the issue</label>
+            <textarea id="contact-issue" name="Issue" rows="7" required
+                      placeholder="Tell us what happened…"></textarea>
+          </div>
+
+          <button type="submit" class="contact__submit">Send</button>
+          <p class="contact__note">Submitting opens your mail app, addressed to attirapp@gmail.com.</p>
+        </form>
+
+        <aside class="contact__aside">
+          <h2>Prefer email?</h2>
+          <p>Write to us directly at:</p>
+          <a class="contact__email" href="mailto:attirapp@gmail.com">attirapp@gmail.com</a>
+          <p class="contact__aside-note">We read every message and reply as quickly as we can.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer__top">
+      <div class="footer__brand">Attira</div>
+      <div class="footer__col">
+        <h4>Company</h4>
+        <a href="index.html#about">About Us</a>
+        <a href="#">Careers</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer__col">
+        <h4>Resources</h4>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+        <a href="#">Cookie Policy</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2025 Attira. All rights reserved.</span>
+      <div class="footer__social">
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

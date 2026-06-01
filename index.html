@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attira — You have the clothes, we have the outfits</title>
+  <meta name="description" content="Attira turns your wardrobe into a catalogue of possibilities. Rediscover outfits from pieces you already own. Join the waitlist." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===================== HEADER / NAV ===================== -->
+  <header class="nav" id="top">
+    <a href="#top" class="nav__logo">ATTIRA</a>
+
+    <nav class="nav__links" id="navLinks">
+      <a href="#about">About</a>
+      <a href="#features">Features</a>
+      <a href="#waitlist" class="nav__cta">Join Waitlist</a>
+    </nav>
+
+    <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="hero__stripes" aria-hidden="true"></div>
+
+    <!-- scrolling tagline ribbon -->
+    <div class="ribbon" aria-hidden="true">
+      <div class="ribbon__track">
+        <span class="ribbon__set">
+          <em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i>
+        </span>
+        <span class="ribbon__set">
+          <em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i>
+        </span>
+      </div>
+    </div>
+
+    <div class="hero__inner">
+      <h1 class="hero__title">You have the clothes,<br />We have the outfits</h1>
+      <img class="hero__image" src="assets/hero-phones.png" alt="Two phones showing the Attira app — a personal AI stylist and a digital wardrobe." />
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT ===================== -->
+  <section class="about" id="about">
+    <div class="about__decor" aria-hidden="true"></div>
+    <h2 class="about__title">About us</h2>
+    <div class="about__grid">
+      <p class="about__text">
+        We started with a simple question: how often do you feel like you have nothing
+        to wear, even with a wardrobe full of clothes? The answer we heard most: “all the
+        time.” That’s why we are building Attira — to help you rediscover outfits from
+        pieces you already own (and perhaps forgot about), reduce decision making, and
+        make getting dressed feel effortless and fun again. We want to turn your wardrobe
+        into a catalogue of possibilities you didn’t even know you had.
+      </p>
+      <div class="about__media">
+        <img src="assets/about-rack.png" alt="A clothing rack of curated garments below framed posters." />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DISCOVER ===================== -->
+  <section class="discover" id="discover">
+    <span class="discover__blob discover__blob--1" aria-hidden="true"></span>
+    <span class="discover__blob discover__blob--2" aria-hidden="true"></span>
+    <span class="discover__blob discover__blob--3" aria-hidden="true"></span>
+
+    <h2 class="discover__heading">Your wardrobe, <em>upgraded</em>.</h2>
+
+    <div class="discover__showcase">
+      <!-- LEFT: numbered stepper navigation -->
+      <ol class="stepper" id="stepper">
+        <li class="stepper__item">
+          <button class="step is-active" type="button" data-step="0" aria-label="Discover">
+            <span class="step__num">1</span><span class="step__label">Discover</span>
+          </button>
+        </li>
+        <li class="stepper__item">
+          <button class="step" type="button" data-step="1" aria-label="Wardrobe">
+            <span class="step__num">2</span><span class="step__label">Wardrobe</span>
+          </button>
+        </li>
+        <li class="stepper__item">
+          <button class="step" type="button" data-step="2" aria-label="Aira">
+            <span class="step__num">3</span><span class="step__label">Aira</span>
+          </button>
+        </li>
+        <li class="stepper__item">
+          <button class="step" type="button" data-step="3" aria-label="Saved">
+            <span class="step__num">4</span><span class="step__label">Saved</span>
+          </button>
+        </li>
+        <li class="stepper__item">
+          <button class="step" type="button" data-step="4" aria-label="Account">
+            <span class="step__num">5</span><span class="step__label">Account</span>
+          </button>
+        </li>
+      </ol>
+
+      <!-- MIDDLE: active step copy (updated by JS) -->
+      <div class="discover__copy">
+        <h3 class="discover__step-title" id="stepTitle">Discover<em>.</em></h3>
+        <p class="discover__step-desc" id="stepDesc">Explore outfit ideas curated from real wardrobes, trends, moods, and occasions — personalised to your style.</p>
+      </div>
+
+      <!-- RIGHT: phone — full app screenshots; tap the tab bar to switch screens -->
+      <div class="discover__phone">
+        <div class="screen-switcher" id="screenSwitcher">
+          <img class="screen-img is-active" data-step="0" src="assets/screen-discover.png"
+            alt="Attira Discover screen — outfit ideas curated for you" />
+          <img class="screen-img" data-step="1" src="assets/screen-wardrobe.png"
+            alt="Attira Wardrobe screen — your closet, organised" />
+          <img class="screen-img" data-step="2" src="assets/screen-aira.png"
+            alt="Attira Aira screen — your personal AI stylist" />
+          <img class="screen-img" data-step="3" src="assets/screen-saved.png"
+            alt="Attira Saved screen — your favourite looks" />
+          <img class="screen-img" data-step="4" src="assets/screen-account.png"
+            alt="Attira Account screen — your style profile" />
+
+          <!-- invisible hit zones over the tab bar drawn into each image -->
+          <div class="tab-hit-zones">
+            <button class="tab-hit" data-step="0" aria-label="Discover"></button>
+            <button class="tab-hit" data-step="1" aria-label="Wardrobe"></button>
+            <button class="tab-hit" data-step="2" aria-label="Aira"></button>
+            <button class="tab-hit" data-step="3" aria-label="Saved"></button>
+            <button class="tab-hit" data-step="4" aria-label="Account"></button>
+          </div>
+        </div>
+        <p class="phone__hint">tap around!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FEATURES / WAITLIST ===================== -->
+  <section class="waitlist" id="features">
+    <div class="waitlist__inner" id="waitlist">
+      <h2 class="waitlist__title">Get early access</h2>
+      <p class="waitlist__sub">Be the first to see how Attira looks and help us shape it for you and many more.</p>
+
+      <form class="waitlist__form" id="waitlistForm" novalidate>
+        <input
+          type="email"
+          id="email"
+          class="waitlist__input"
+          placeholder="drop your email to be a beta tester"
+          autocomplete="email"
+          required
+        />
+        <button type="submit" class="waitlist__submit">submit</button>
+      </form>
+      <p class="waitlist__msg" id="waitlistMsg" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer__top">
+      <div class="footer__brand">Attira</div>
+      <div class="footer__col">
+        <h4>Company</h4>
+        <a href="#about">About Us</a>
+        <a href="#">Careers</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer__col">
+        <h4>Resources</h4>
+        <a href="faq.html">FAQ</a>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2025 Attira. All rights reserved.</span>
+      <div class="footer__social">
+        <a href="https://www.instagram.com/attira.closet" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://www.linkedin.com/company/attira/people/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

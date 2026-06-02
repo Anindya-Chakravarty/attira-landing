@@ -5,10 +5,104 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Attira — You have the clothes, we have the outfits</title>
   <meta name="description" content="Attira turns your wardrobe into a catalogue of possibilities. Rediscover outfits from pieces you already own. Join the waitlist." />
+  <link rel="canonical" href="https://attira.org/" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#fffce8" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Attira" />
+  <meta property="og:title" content="Attira — You have the clothes, we have the outfits" />
+  <meta property="og:description" content="Attira turns your wardrobe into a catalogue of possibilities. Rediscover outfits from pieces you already own. Join the waitlist." />
+  <meta property="og:url" content="https://attira.org/" />
+  <meta property="og:image" content="https://attira.org/assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Attira — You have the clothes, we have the outfits" />
+  <meta name="twitter:description" content="Attira turns your wardrobe into a catalogue of possibilities. Rediscover outfits from pieces you already own. Join the waitlist." />
+  <meta name="twitter:image" content="https://attira.org/assets/og-image.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=2" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://attira.org/#website",
+        "name": "Attira",
+        "url": "https://attira.org/",
+        "description": "Attira turns your wardrobe into a catalogue of possibilities — rediscover outfits from pieces you already own with an AI personal stylist.",
+        "inLanguage": "en",
+        "publisher": { "@id": "https://attira.org/#organization" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://attira.org/#organization",
+        "name": "Attira",
+        "url": "https://attira.org/",
+        "logo": "https://attira.org/assets/favicon.svg",
+        "image": "https://attira.org/assets/og-image.png",
+        "description": "Attira is an AI personal stylist that turns the clothes you already own into a catalogue of outfit possibilities.",
+        "email": "attirapp@gmail.com",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "email": "attirapp@gmail.com",
+          "availableLanguage": "English"
+        },
+        "sameAs": [
+          "https://www.instagram.com/attira.closet",
+          "https://www.linkedin.com/company/attira/people/"
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://attira.org/#app",
+        "name": "Attira",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "iOS, Android",
+        "url": "https://attira.org/",
+        "description": "Attira turns your wardrobe into a catalogue of possibilities — rediscover outfits from pieces you already own with an AI personal stylist.",
+        "screenshot": "https://attira.org/assets/og-image.png",
+        "featureList": [
+          "Discover — outfit ideas curated from your own wardrobe, trends, moods, and occasions",
+          "Wardrobe — a digital catalogue of the clothes you already own",
+          "AIRA — an AI personal stylist that learns your Style DNA",
+          "Saved — keep and revisit the looks you love",
+          "Occasion styling — dress for work, dinner, weekend, or travel"
+        ],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "publisher": { "@id": "https://attira.org/#organization" }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://attira.org/#webpage",
+        "url": "https://attira.org/",
+        "name": "Attira — You have the clothes, we have the outfits",
+        "description": "Attira turns your wardrobe into a catalogue of possibilities. Rediscover outfits from pieces you already own. Join the waitlist.",
+        "isPartOf": { "@id": "https://attira.org/#website" },
+        "about": { "@id": "https://attira.org/#app" },
+        "inLanguage": "en",
+        "speakable": {
+          "@type": "SpeakableSpecification",
+          "cssSelector": ["h1", ".about__text"]
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <!-- ===================== HEADER / NAV ===================== -->
@@ -17,13 +111,8 @@
 
     <nav class="nav__links" id="navLinks">
       <a href="#about">About</a>
-      <a href="#features">Features</a>
-      <a href="#waitlist" class="nav__cta">Join Waitlist</a>
+      <a href="#discover">Features</a>
     </nav>
-
-    <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
   </header>
 
   <!-- ===================== HERO ===================== -->
@@ -34,17 +123,25 @@
     <div class="ribbon" aria-hidden="true">
       <div class="ribbon__track">
         <span class="ribbon__set">
-          <em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i>
+          <em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i><em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i><em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i>
         </span>
         <span class="ribbon__set">
-          <em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i>
+          <em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i><em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i><em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i>
         </span>
       </div>
     </div>
 
     <div class="hero__inner">
-      <h1 class="hero__title">You have the clothes,<br />We have the outfits</h1>
-      <img class="hero__image" src="assets/hero-phones.png" alt="Two phones showing the Attira app — a personal AI stylist and a digital wardrobe." />
+      <a href="#waitlist" class="hero__cta">Join Waitlist</a>
+      <h1 class="hero__title">You have the clothes,<br />We have the outfits!</h1>
+      <picture>
+        <source type="image/webp" srcset="assets/hero-phones.webp" />
+        <img class="hero__image" src="assets/hero-phones.png" width="1536" height="1024" alt="Two phones showing the Attira app — a personal AI stylist and a digital wardrobe." />
+      </picture>
+      <picture>
+        <source type="image/webp" srcset="assets/hero-phone.webp" />
+        <img class="hero__phone-mobile" src="assets/hero-phone.png" width="707" height="1288" alt="The Attira app shown on an iPhone — wardrobe grid with the bottom navigation bar." />
+      </picture>
     </div>
   </section>
 
@@ -62,7 +159,10 @@
         into a catalogue of possibilities you didn’t even know you had.
       </p>
       <div class="about__media">
-        <img src="assets/about-rack.png" alt="A clothing rack of curated garments below framed posters." />
+        <picture>
+          <source type="image/webp" srcset="assets/about-rack.webp" />
+          <img src="assets/about-rack.png" width="736" height="981" loading="lazy" alt="A clothing rack of curated garments below framed posters." />
+        </picture>
       </div>
     </div>
   </section>
@@ -73,6 +173,8 @@
     <span class="discover__blob discover__blob--2" aria-hidden="true"></span>
     <span class="discover__blob discover__blob--3" aria-hidden="true"></span>
 
+    <div class="discover__scroll" id="discoverScroll">
+     <div class="discover__sticky">
     <h2 class="discover__heading">Your wardrobe, <em>upgraded</em>.</h2>
 
     <div class="discover__showcase">
@@ -113,29 +215,58 @@
 
       <!-- RIGHT: phone — full app screenshots; tap the tab bar to switch screens -->
       <div class="discover__phone">
-        <div class="screen-switcher" id="screenSwitcher">
-          <img class="screen-img is-active" data-step="0" src="assets/screen-discover.png"
-            alt="Attira Discover screen — outfit ideas curated for you" />
-          <img class="screen-img" data-step="1" src="assets/screen-wardrobe.png"
-            alt="Attira Wardrobe screen — your closet, organised" />
-          <img class="screen-img" data-step="2" src="assets/screen-aira.png"
-            alt="Attira Aira screen — your personal AI stylist" />
-          <img class="screen-img" data-step="3" src="assets/screen-saved.png"
-            alt="Attira Saved screen — your favourite looks" />
-          <img class="screen-img" data-step="4" src="assets/screen-account.png"
-            alt="Attira Account screen — your style profile" />
-
-          <!-- invisible hit zones over the tab bar drawn into each image -->
-          <div class="tab-hit-zones">
-            <button class="tab-hit" data-step="0" aria-label="Discover"></button>
-            <button class="tab-hit" data-step="1" aria-label="Wardrobe"></button>
-            <button class="tab-hit" data-step="2" aria-label="Aira"></button>
-            <button class="tab-hit" data-step="3" aria-label="Saved"></button>
-            <button class="tab-hit" data-step="4" aria-label="Account"></button>
+        <!-- one static phone; only the inner screenshot + active tab change -->
+        <div class="device">
+          <div class="device__screen">
+            <div class="device__shots" id="screenShots">
+              <picture>
+                <source type="image/webp" srcset="assets/content-discover.webp" />
+                <img class="device__shot is-active" data-step="0" src="assets/content-discover.png" width="398" height="775" alt="The Attira app — Discover screen" />
+              </picture>
+              <picture>
+                <source type="image/webp" srcset="assets/content-wardrobe.webp" />
+                <img class="device__shot" data-step="1" src="assets/content-wardrobe.png" width="540" height="1132" loading="lazy" alt="The Attira app — Wardrobe screen" />
+              </picture>
+              <picture>
+                <source type="image/webp" srcset="assets/content-aira.webp" />
+                <img class="device__shot" data-step="2" src="assets/content-aira.png" width="308" height="578" loading="lazy" alt="The Attira app — Aira screen" />
+              </picture>
+              <picture>
+                <source type="image/webp" srcset="assets/content-saved.webp" />
+                <img class="device__shot" data-step="3" src="assets/content-saved.png" width="308" height="578" loading="lazy" alt="The Attira app — Saved screen" />
+              </picture>
+              <picture>
+                <source type="image/webp" srcset="assets/content-account.webp" />
+                <img class="device__shot" data-step="4" src="assets/content-account.png" width="308" height="578" loading="lazy" alt="The Attira app — Account screen" />
+              </picture>
+            </div>
+            <nav class="device__tabs" id="phoneTabs" aria-label="App sections">
+              <button class="ptab is-active" type="button" data-step="0" aria-label="Discover">
+                <span class="ptab__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
+                <span>Discover</span>
+              </button>
+              <button class="ptab" type="button" data-step="1" aria-label="Wardrobe">
+                <span class="ptab__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="1.6"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="9" y1="11" x2="9" y2="13"/><line x1="15" y1="11" x2="15" y2="13"/></svg></span>
+                <span>Wardrobe</span>
+              </button>
+              <button class="ptab ptab--aira" type="button" data-step="2" aria-label="Aira">
+                <span class="ptab__icon">A</span>
+                <span>Aira</span>
+              </button>
+              <button class="ptab" type="button" data-step="3" aria-label="Saved">
+                <span class="ptab__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20s-7-4.4-9.2-8.8C1.1 7.7 3 4.6 6.1 4.8 8.3 4.9 9.9 6.4 12 8.6c2.1-2.2 3.7-3.7 5.9-3.8 3.1-.2 5 2.9 3.3 6.4C19 15.6 12 20 12 20z"/></svg></span>
+                <span>Saved</span>
+              </button>
+              <button class="ptab" type="button" data-step="4" aria-label="Account">
+                <span class="ptab__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg></span>
+                <span>Account</span>
+              </button>
+            </nav>
           </div>
         </div>
-        <p class="phone__hint">tap around!</p>
       </div>
+    </div>
+     </div>
     </div>
   </section>
 
@@ -146,11 +277,12 @@
       <p class="waitlist__sub">Be the first to see how Attira looks and help us shape it for you and many more.</p>
 
       <form class="waitlist__form" id="waitlistForm" novalidate>
+        <label for="email" class="visually-hidden">Email address</label>
         <input
           type="email"
           id="email"
           class="waitlist__input"
-          placeholder="drop your email to be a beta tester"
+          placeholder="your@email.com"
           autocomplete="email"
           required
         />
@@ -167,7 +299,6 @@
       <div class="footer__col">
         <h4>Company</h4>
         <a href="#about">About Us</a>
-        <a href="#">Careers</a>
         <a href="contact.html">Contact</a>
       </div>
       <div class="footer__col">
@@ -181,7 +312,7 @@
       </div>
     </div>
     <div class="footer__bottom">
-      <span>© 2025 Attira. All rights reserved.</span>
+      <span>© 2026 Attira. All rights reserved.</span>
       <div class="footer__social">
         <a href="https://www.instagram.com/attira.closet" target="_blank" rel="noopener noreferrer">Instagram</a>
         <a href="https://www.linkedin.com/company/attira/people/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
@@ -189,6 +320,6 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=2" defer></script>
 </body>
 </html>

@@ -10,11 +10,17 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "export": "node export-emails.js"
+    "export": "node export-emails.js",
+    "gen-webp": "node scripts/gen-webp.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.3.0",
+    "compression": "^1.7.4",
     "express": "^4.21.1",
-    "express-rate-limit": "^7.4.1"
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.0"
   }
 }

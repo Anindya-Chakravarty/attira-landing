@@ -1,0 +1,44 @@
+# Attira — https://attira.org
+# All crawlers are welcome to index the public site.
+
+User-agent: *
+Allow: /
+
+# ── AI / generative search crawlers (explicitly welcomed) ──────────
+# OpenAI (ChatGPT, OpenAI search)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# Anthropic (Claude)
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# Google AI (Gemini, AI Overviews)
+User-agent: Google-Extended
+Allow: /
+
+# Microsoft (Bing, Copilot)
+User-agent: Bingbot
+Allow: /
+
+# Apple (Siri, Spotlight, Apple Intelligence)
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://attira.org/sitemap.xml

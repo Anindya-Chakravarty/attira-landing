@@ -10,6 +10,8 @@
 const path = require("path");
 const crypto = require("crypto");
 const express = require("express");
+const compression = require("compression");
+const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const waitlist = require("./db");
 
@@ -22,6 +24,40 @@ const ADMIN_KEY = process.env.ADMIN_KEY || "";
 const app = express();
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
+
+/* ── Security headers (helmet) ──────────────────────────────────────
+   CSP is tuned for this site: styles + the Google Fonts stylesheet,
+   fonts from gstatic, images from self + data: URIs, scripts from self
+   only. JSON-LD (<script type="application/ld+json">) is a data block,
+   not executed, so it needs no script-src allowance. */
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "script-src": ["'self'"],
+        "style-src": ["'self'", "https://fonts.googleapis.com"],
+        "font-src": ["'self'", "https://fonts.gstatic.com"],
+        "img-src": ["'self'", "data:"],
+        "connect-src": ["'self'"],
+        // contact.html submits via action="mailto:…", so allow the mailto scheme.
+        "form-action": ["'self'", "mailto:"],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"],
+        "frame-ancestors": ["'none'"],
+        "upgrade-insecure-requests": null,
+      },
+    },
+    // HSTS is only meaningful over HTTPS; enable when deployed behind TLS.
+    hsts: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+/* ── Gzip/Brotli compression for text assets (html/css/js/json) ─── */
+app.use(compression());
+
 app.use(express.json({ limit: "16kb" }));
 
 /* ── Rate limit the signup endpoint (anti-spam) ─────────────────── */
@@ -102,9 +138,12 @@ app.use(
   express.static(STATIC_DIR, {
     extensions: ["html"],
     setHeaders(res, filePath) {
+      // Revalidate code/markup every load so edits are never served stale;
+      // keep heavier assets (images, fonts) cached.
+      const revalidate = /\.(html|js|css)$/.test(filePath);
       res.setHeader(
         "Cache-Control",
-        filePath.endsWith(".html") ? "no-cache" : "public, max-age=3600"
+        revalidate ? "no-cache" : "public, max-age=3600"
       );
     },
   })

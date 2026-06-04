@@ -1,0 +1,26 @@
+node_modules
+npm-debug.log
+data
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.env
+.env.*
+.git
+.gitignore
+.DS_Store
+*.md
+.claude
+.agents
+scripts
+export-emails.js
+skills-lock.json
+
+# stray pasted screenshots/exports in the project root — never ship.
+# (assets/*.png is re-included so the real image assets still build.)
+*.png
+!assets/*.png
+
+# scratch/temp files — never ship
+__*

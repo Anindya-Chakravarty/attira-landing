@@ -14,6 +14,12 @@ const compression = require("compression");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const waitlist = require("./db");
+const { PostHog } = require("posthog-node");
+
+const posthog = new PostHog(process.env.POSTHOG_API_KEY, {
+  host: process.env.POSTHOG_HOST || "https://us.i.posthog.com",
+  enableExceptionAutocapture: true,
+});
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const STATIC_DIR = __dirname;
@@ -87,9 +93,39 @@ app.post("/api/waitlist", signupLimiter, (req, res) => {
       source: "website",
       userAgent: req.get("user-agent") || "",
     });
+    const distinctId = email.trim().toLowerCase();
+    if (result.status === "created") {
+      posthog.identify({
+        distinctId,
+        properties: {
+          $set: { email: distinctId },
+          $set_once: { waitlist_joined_at: new Date().toISOString() },
+        },
+      });
+      posthog.capture({
+        distinctId,
+        event: "waitlist_signup",
+        properties: {
+          source: "website",
+          $set: { email: distinctId },
+        },
+      });
+    } else {
+      posthog.capture({
+        distinctId,
+        event: "waitlist_signup_existing",
+        properties: { source: "website" },
+      });
+    }
     return res.json({ ok: true, status: result.status });
   } catch (err) {
     console.error("waitlist insert failed:", err);
+    posthog.captureException(err, undefined, { endpoint: "/api/waitlist" });
+    posthog.capture({
+      distinctId: "server",
+      event: "waitlist_signup_failed",
+      properties: { error: err && err.message, endpoint: "/api/waitlist" },
+    });
     return res
       .status(500)
       .json({ ok: false, error: "Something went wrong. Please try again in a moment." });
@@ -124,6 +160,11 @@ function adminKeyMatches(req) {
 app.get("/api/waitlist/export", (req, res) => {
   if (!adminKeyMatches(req)) return res.status(404).end();
   const rows = waitlist.exportAll();
+  posthog.capture({
+    distinctId: "admin",
+    event: "waitlist_export_accessed",
+    properties: { row_count: rows.length },
+  });
   const header = "id,email,source,user_agent,created_at\n";
   const body = rows
     .map((r) => [r.id, r.email, r.source, r.user_agent, r.created_at].map(csvEscape).join(","))
@@ -138,13 +179,16 @@ app.use(
   express.static(STATIC_DIR, {
     extensions: ["html"],
     setHeaders(res, filePath) {
-      // Revalidate code/markup every load so edits are never served stale;
-      // keep heavier assets (images, fonts) cached.
-      const revalidate = /\.(html|js|css)$/.test(filePath);
-      res.setHeader(
-        "Cache-Control",
-        revalidate ? "no-cache" : "public, max-age=3600"
-      );
+      if (/\.html$/.test(filePath)) {
+        // markup must always revalidate so new ?v= asset references are picked up
+        res.setHeader("Cache-Control", "no-cache");
+      } else if (/\.(css|js)$/.test(filePath)) {
+        // css/js are ?v=-versioned in the HTML → safe to cache hard (1 year)
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      } else {
+        // images / fonts / other static assets — cache a week
+        res.setHeader("Cache-Control", "public, max-age=604800");
+      }
     },
   })
 );
@@ -162,8 +206,9 @@ const server = app.listen(PORT, () => {
 });
 
 function shutdown() {
-  server.close(() => {
+  server.close(async () => {
     try { waitlist._db.close(); } catch (_) {}
+    await posthog.shutdown();
     process.exit(0);
   });
 }

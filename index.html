@@ -28,7 +28,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="styles.css?v=17" />
+
+  <!-- preload the LCP hero image (the one that matches this viewport) -->
+  <link rel="preload" as="image" media="(max-width: 768px)" href="assets/hero-phone.webp" />
+  <link rel="preload" as="image" media="(min-width: 769px)" href="assets/hero-phones.webp" />
 
   <script type="application/ld+json">
   {
@@ -106,17 +110,19 @@
 </head>
 <body>
   <!-- ===================== HEADER / NAV ===================== -->
-  <header class="nav" id="top">
+  <header class="nav">
     <a href="#top" class="nav__logo">ATTIRA</a>
 
     <nav class="nav__links" id="navLinks">
       <a href="#about">About</a>
       <a href="#discover">Features</a>
     </nav>
+
+    <a href="#waitlist" class="nav__cta">Join Waitlist</a>
   </header>
 
   <!-- ===================== HERO ===================== -->
-  <section class="hero">
+  <section class="hero" id="top">
     <div class="hero__stripes" aria-hidden="true"></div>
 
     <!-- scrolling tagline ribbon -->
@@ -132,15 +138,15 @@
     </div>
 
     <div class="hero__inner">
-      <a href="#waitlist" class="hero__cta">Join Waitlist</a>
+      <div class="hero__cta-wrap"><a href="#waitlist" class="hero__cta">Join Waitlist</a></div>
       <h1 class="hero__title">You have the clothes,<br />We have the outfits!</h1>
+      <!-- One <picture> that swaps by viewport so only ONE hero image downloads:
+           phones get the small single-phone shot, desktop gets the two-phone shot. -->
       <picture>
+        <source media="(max-width: 768px)" type="image/webp" srcset="assets/hero-phone.webp" />
+        <source media="(max-width: 768px)" srcset="assets/hero-phone.png" />
         <source type="image/webp" srcset="assets/hero-phones.webp" />
-        <img class="hero__image" src="assets/hero-phones.png" width="1536" height="1024" alt="Two phones showing the Attira app — a personal AI stylist and a digital wardrobe." />
-      </picture>
-      <picture>
-        <source type="image/webp" srcset="assets/hero-phone.webp" />
-        <img class="hero__phone-mobile" src="assets/hero-phone.png" width="707" height="1288" alt="The Attira app shown on an iPhone — wardrobe grid with the bottom navigation bar." />
+        <img class="hero__image" src="assets/hero-phones.png" fetchpriority="high" decoding="async" alt="The Attira app — a personal AI stylist and your digital wardrobe." />
       </picture>
     </div>
   </section>

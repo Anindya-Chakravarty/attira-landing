@@ -37,8 +37,12 @@ body {
 img { display: block; max-width: 100%; }
 
 /* <picture> wrappers must not introduce a box — keep the inner <img> as the
-   direct flex/grid/positioned child so wrapping for WebP changes no layout. */
+   direct flex/grid/positioned child so wrapping for WebP changes no layout.
+   `display: contents` also exposes the <source> elements to the parent layout,
+   so hide them — otherwise each <source> eats a flex `gap` slot (this was pushing
+   the hero phone ~120px below the headline). Sources are metadata; never render. */
 picture { display: contents; }
+source { display: none; }
 
 section { scroll-margin-top: 95px; }
 
@@ -77,7 +81,7 @@ textarea:focus-visible,
   justify-content: space-between;
   height: 95px;
   padding: 0 var(--pad);
-  background: var(--cream);
+  background: #faf8f4;
   border-bottom: 1px solid rgba(61, 54, 50, 0.06);
 }
 
@@ -91,7 +95,11 @@ textarea:focus-visible,
   text-decoration: none;
 }
 
+/* links sit visually centered in the bar (logo left, CTA right) — Figma nav */
 .nav__links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: clamp(24px, 4vw, 48px);
@@ -107,8 +115,11 @@ textarea:focus-visible,
 .nav__links a:not(.nav__cta):hover { color: var(--orange); }
 
 .nav__cta {
-  background: var(--lavender);
+  background: var(--orange);
+  color: #000;
+  font-size: 20px;
   font-weight: 700;
+  text-decoration: none;
   padding: 14px 28px;
   border-radius: 10px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -222,9 +233,12 @@ textarea:focus-visible,
   margin: 0 0 24px;
 }
 
-/* primary call-to-action above the hero title — bold orange stadium pill */
+/* primary call-to-action above the hero title — bold orange stadium pill.
+   Desktop puts "Join Waitlist" in the nav (Figma), so this pill is mobile-only;
+   the wrapper + pill are re-shown in the ≤768px block. */
+.hero__cta-wrap { display: none; }
 .hero__cta {
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   background: #ff5733;
@@ -243,9 +257,6 @@ textarea:focus-visible,
   box-shadow: 0 14px 32px rgba(255, 87, 51, 0.55);
 }
 
-/* single upright phone shown only on mobile (see responsive block) */
-.hero__phone-mobile { display: none; }
-
 .hero__image {
   width: auto;
   max-width: 100%;
@@ -258,7 +269,7 @@ textarea:focus-visible,
 /* ===================== ABOUT ===================== */
 .about {
   position: relative;
-  background: var(--sage);
+  background: var(--cream);
   padding: clamp(48px, 8vw, 96px) var(--pad);
   overflow: hidden;
 }
@@ -608,8 +619,9 @@ textarea:focus-visible,
 }
 
 /* ===================== WAITLIST ===================== */
+/* orange block, lavender input, deep-purple submit — Figma "Get early access" */
 .waitlist {
-  background: var(--cream);
+  background: #ff5722;
   padding: clamp(56px, 9vw, 110px) var(--pad);
 }
 .waitlist__inner {
@@ -622,13 +634,13 @@ textarea:focus-visible,
   font-weight: 700;
   font-size: clamp(40px, 6vw, 75px);
   margin: 0 0 16px;
-  color: #000;
+  color: #fff;
 }
 .waitlist__sub {
   font-size: clamp(17px, 2vw, 24px);
   margin: 0 auto 40px;
   max-width: 620px;
-  color: #4a443f;
+  color: #fff;
 }
 .waitlist__form {
   display: flex;
@@ -641,9 +653,9 @@ textarea:focus-visible,
   min-width: 0;
   height: 72px;
   padding: 0 28px;
-  border: 1px solid rgba(61, 54, 50, 0.18);
+  border: 1px solid transparent;
   border-radius: 14px;
-  background: #fff;
+  background: #d9cafe;
   font-family: inherit;
   font-size: 18px;
   color: var(--ink);
@@ -658,7 +670,7 @@ textarea:focus-visible,
   padding: 0 48px;
   border: 0;
   border-radius: 14px;
-  background: var(--orange);
+  background: #4c1d95;
   color: #fff;
   font-family: inherit;
   font-size: 20px;
@@ -666,7 +678,7 @@ textarea:focus-visible,
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
-.waitlist__submit:hover { background: #c8431a; transform: translateY(-2px); }
+.waitlist__submit:hover { background: #3d1679; transform: translateY(-2px); }
 .waitlist__msg {
   min-height: 22px;
   margin: 18px 0 0;
@@ -752,15 +764,17 @@ textarea:focus-visible,
 
   /* keep the links inline on mobile — no dropdown, no hamburger */
   .nav__links {
+    position: static;
+    transform: none;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: clamp(16px, 5vw, 28px);
   }
   .nav__links a { font-size: 16px; }
-  /* subpages keep an in-nav Join Waitlist pill — hide it on mobile so every
-     page shows the same clean inline links and the bar never overflows */
-  .nav__links .nav__cta { display: none; }
+  /* the nav Join Waitlist button is desktop-only — on mobile the orange pill
+     under the nav (.hero__cta) is the CTA, so hide the nav button here */
+  .nav__cta { display: none; }
   /* no mobile menu toggle */
   .nav__actions,
   .nav__toggle { display: none; }
@@ -770,14 +784,20 @@ textarea:focus-visible,
 
   /* ----- HERO: one full viewport — iPhone mockup (nav inside) on stripes ----- */
   /* keep the scrolling tagline loop on mobile, just slimmer so it fits the hero */
-  .ribbon { padding: 10px 0; }
-  .ribbon em { font-size: 11px; letter-spacing: 3px; padding: 0 10px; }
+  /* center the running marquee vertically in the bar (it was bottom-jammed) and
+     give it a touch more height so the letters aren't compacted */
+  .ribbon { padding: 14px 0; display: flex; align-items: center; }
+  .ribbon__track { flex: none; }
+  .ribbon em { font-size: 13px; letter-spacing: 1.2px; font-weight: 500; line-height: 1; padding: 0 11px; }
 
-  /* fills the screen below the 64px sticky header so only the hero shows on landing */
+  /* at least one screen below the 64px sticky header, but allowed to GROW so that
+     on short devices (iPhone SE, iPhone 14 w/ address bar) the content is never
+     clipped — the CTA pill must stay fully visible, not hidden under the header.
+     No fixed height + no vertical clip; horizontal overflow is handled by
+     body{overflow-x:hidden}. */
   .hero {
-    height: calc(100svh - 64px);
     min-height: calc(100svh - 64px);
-    overflow: hidden;
+    overflow: visible;
   }
 
   /* soft pale peach/salmon candy stripes (same palette as desktop, slimmer) */
@@ -796,7 +816,24 @@ textarea:focus-visible,
 
   .hero__inner {
     justify-content: center;
+    /* don't shrink below the content (base sets min-height:0): on short screens
+       this lets the inner grow to fit so the centered content's top — the pill —
+       sits just below the ribbon instead of overflowing up under the header */
+    min-height: auto;
+    /* stretch (not center) so the CTA wrapper fills the full width and the pill
+       can reach the right edge; title/phone re-center themselves below */
+    align-items: stretch;
     gap: clamp(20px, 4.5vh, 38px);
+    /* full-bleed inner: the base `margin: 0 auto` shrink-wraps the inner to its
+       content width (auto cross-axis margins disable flex stretch), which would
+       stop the CTA pill from ever reaching the screen edge. Force full width with
+       no side padding so the pill can sit flush against the right edge. Title and
+       phone stay centered, so they don't need the side padding. */
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+    padding-left: 0;
+    padding-right: 0;
     padding-top: clamp(24px, 6vh, 48px);
     padding-bottom: clamp(20px, 5vh, 40px);
   }
@@ -806,31 +843,37 @@ textarea:focus-visible,
     margin-bottom: 0;
     text-shadow: 0 3px 3px rgba(0, 0, 0, 0.25);
   }
-  /* full-width orange stadium button under the nav, matching the mobile design */
-  .hero__cta {
-    align-self: stretch;
-    padding: 16px 24px;
-    font-size: 17px;
-    border-radius: 999px;
+  /* Figma mobile: pill anchored to the right screen edge, rounded left end ~a
+     third in. The wrapper spans the full hero width (no side padding on the
+     inner), and the pill is a normal block inside it sized purely by percentages:
+     margin-left 32% + width 68% = 100%, so the right edge is always flush and the
+     left always lands at a third — identical proportions on every device width.
+     Padding/font use clamp so the pill scales up on larger screens. */
+  /* full-width flex wrapper; pill grows (flex:1) to fill from a 30% left inset to
+     the right edge — same proportions on every device width, always flush right */
+  .hero__cta-wrap {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 25%;
   }
-  /* desktop two-phone shot hidden; show the single upright phone mockup */
-  .hero__image { display: none; }
-  .hero__phone-mobile {
-    display: block;
-    width: auto;
-    /* larger so it reads as the natural focal point, not a small floating cutout;
-       still capped by height so the title + CTA fit in the one-screen hero */
+  .hero__cta {
+    display: flex;
+    flex: 1;
+    padding: clamp(11px, 3.3vw, 20px) clamp(20px, 6vw, 48px);
+    font-size: clamp(15px, 4.4vw, 24px);
+    border-radius: 999px 0 0 999px;
+  }
+  /* the single hero <picture> serves the upright single-phone shot on mobile;
+     size + shadow it for the one-screen hero (was .hero__phone-mobile) */
+  .hero__image {
     max-width: 80%;
     max-height: 60vh;
-    margin: 0 auto;
-    /* soft shadow grounds the phone above the stripes instead of looking pasted */
     filter: drop-shadow(0 22px 38px rgba(61, 54, 50, 0.28));
   }
 
   /* ----- ABOUT: rack photo, then text in a rounded lavender card, no heading ----- */
-  /* light cream base on mobile (sage is desktop-only), matching the Figma mobile frame */
   .about {
-    background: var(--cream);
     padding-top: clamp(40px, 12vw, 64px);
   }
   .about__title { display: none; }
@@ -892,15 +935,28 @@ textarea:focus-visible,
     max-width: none;
     margin-top: clamp(10px, 3vw, 20px);
   }
+  /* keep the pinned title fully visible on phones: top-align the stack so the
+     two-line heading sits just under the 64px sticky header instead of being
+     vertically centered — centering pushed "Your wardrobe," above the
+     overflow-hidden clip on short viewports. Tighten the heading and trim the
+     phone so the whole composition still fits one short viewport. */
+  .discover.is-scrolly .discover__sticky {
+    justify-content: flex-start;
+    padding-top: clamp(70px, 9vh, 88px);
+    gap: clamp(6px, 1.5vh, 14px);
+  }
+  .discover.is-scrolly .discover__heading {
+    font-size: clamp(30px, 8vw, 40px);
+    line-height: 1.12;
+  }
+  .discover.is-scrolly .device {
+    width: min(clamp(180px, 40vw, 280px), 22svh);
+    max-width: 22svh;
+  }
 
-  /* ----- WAITLIST: orange block, lavender input, deep-purple submit ----- */
-  .waitlist { background: #ff5722; }
-  .waitlist__title, .waitlist__sub { color: #fff; }
+  /* ----- WAITLIST: stack the form (colors now come from the base rules) ----- */
   .waitlist__form { flex-direction: column; }
   .waitlist__input, .waitlist__submit { width: 100%; height: 60px; }
-  .waitlist__input { background: #d9cafe; border-color: transparent; }
-  .waitlist__submit { background: #4c1d95; }
-  .waitlist__submit:hover { background: #3d1679; }
 
   /* ----- FOOTER: single stacked column ----- */
   .footer__top {
@@ -911,6 +967,35 @@ textarea:focus-visible,
     flex-direction: column;
     gap: 18px;
     text-align: center;
+  }
+}
+
+/* short phones (e.g. iPhone SE, 667px tall): the pinned Discover stack can't fit
+   the heading + the full-height 5-item stepper + phone + step description inside
+   one 100svh stage, so the description was clipped at the bottom. On these short
+   viewports only, compact the stepper (smaller badges, tighter gaps), the phone,
+   the step title and the top padding so every step's description stays visible.
+   Taller phones (iPhone 14+, ~844px) already have ample headroom — the
+   max-height query leaves them completely untouched. */
+@media (max-width: 768px) and (max-height: 720px) {
+  .discover.is-scrolly .discover__sticky {
+    padding-top: clamp(58px, 8vh, 70px);
+    gap: clamp(4px, 1vh, 10px);
+  }
+  .discover.is-scrolly .device {
+    width: min(clamp(150px, 36vw, 220px), 19svh);
+    max-width: 19svh;
+  }
+  .discover.is-scrolly .stepper { gap: 12px; }
+  .discover.is-scrolly .step__num { width: 44px; height: 44px; font-size: 20px; }
+  /* realign the connector line to the smaller 44px badge + 12px gap */
+  .discover.is-scrolly .stepper__item:not(:last-child)::after {
+    top: calc(50% + 22px);
+    height: calc(100% - 44px + 12px);
+  }
+  .discover.is-scrolly .discover__step-title {
+    font-size: clamp(28px, 7vw, 36px);
+    margin-bottom: 10px;
   }
 }
 

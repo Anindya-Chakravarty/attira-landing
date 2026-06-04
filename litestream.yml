@@ -1,0 +1,18 @@
+# Continuous SQLite replication to Google Cloud Storage.
+#
+# Authentication: Litestream's GCS replica reads credentials from
+# GOOGLE_APPLICATION_CREDENTIALS or the ambient GCP service account
+# (Cloud Run / GCE metadata server). Outside GCP, set
+# GOOGLE_APPLICATION_CREDENTIALS to a service-account JSON path —
+# otherwise pushes fail at startup with a 401/403 from the bucket.
+#
+# Required IAM on the bucket: roles/storage.objectAdmin.
+dbs:
+  - path: /data/waitlist.db
+    replicas:
+      - type: gcs
+        bucket: ${LITESTREAM_GCS_BUCKET}
+        path: waitlist.db
+        # Keep at least 24h of WAL snapshots for point-in-time recovery.
+        retention: 24h
+        snapshot-interval: 1h

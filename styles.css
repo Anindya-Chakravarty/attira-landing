@@ -592,6 +592,22 @@ textarea:focus-visible {
    the .is-active class, CSS owns the crossfade in both scroll and click modes */
 .device__shot.is-active { opacity: 1; transform: none; z-index: 1; }
 
+/* Uniform Dynamic Island — every screenshot shows the SAME notch (the baked-in OS
+   status bars / bezels were cropped off the images, see scripts/crop-shots.js). */
+.device__screen::after {
+  content: "";
+  position: absolute;
+  top: 2.4%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 31%;
+  aspect-ratio: 3.4 / 1;   /* real Dynamic Island proportion */
+  background: #0b0b0d;
+  border-radius: 999px;
+  z-index: 3;
+  pointer-events: none;
+}
+
 /* Discover is a click/tap-driven accordion (no scroll-jacking) — the scroll and
    sticky wrappers are plain pass-through containers at natural height. */
 .discover__scroll { position: relative; }

@@ -935,10 +935,10 @@ textarea:focus-visible {
   }
   /* expanded description: calm, editorial rhythm within its column */
   .feature__desc {
-    font-size: 14px;        /* fits the column without crumpling */
-    line-height: 1.55;
-    margin-top: 8px;        /* gap below the title/icon row (was 0) */
-    margin-bottom: 20px;    /* gap above the divider/next tile (was ~16px) */
+    font-size: 15px;        /* more readable */
+    line-height: 1.6;       /* calmer */
+    margin-top: 10px;       /* gap below the title/icon row */
+    margin-bottom: 22px;    /* gap above the divider/next tile */
     padding-left: 14px;     /* clear the orange accent bar; align under the label */
     padding-right: 6px;     /* avoid right-edge crowding */
   }

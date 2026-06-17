@@ -929,9 +929,17 @@ textarea:focus-visible {
      contained inside its column with margin so neither the frame nor its soft
      shadow reaches the section's clip box (no overflow, no clipping). */
   .discover__showcase {
-    grid-template-columns: 35% 1fr;
-    gap: clamp(8px, 3vw, 16px);
-    align-items: center;
+    grid-template-columns: 1fr;          /* stack: accordion on top, phone below */
+    gap: clamp(28px, 7vw, 40px);          /* vertical breathing room between them */
+    align-items: stretch;
+  }
+  /* expanded description now has the full width — give it a calm, editorial rhythm */
+  .feature__desc {
+    line-height: 1.6;        /* was 1.55 */
+    margin-top: 10px;        /* gap below the title/icon row (was 0) */
+    margin-bottom: 24px;     /* gap above the divider/next tile (was ~16px) */
+    padding-left: 16px;      /* clear the orange accent bar; aligns with the label */
+    padding-right: 8px;      /* avoid right-edge crowding */
   }
   .discover__heading {
     font-size: clamp(30px, 8vw, 42px);

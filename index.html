@@ -11,6 +11,10 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
 
+  <!-- PostHog (client) — pageviews + automatic UTM capture for traffic-source tracking.
+       Self-hosted (not inline) so it passes the strict script-src 'self' CSP. -->
+  <script src="ph-init.js?v=1"></script>
+
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Attira" />
@@ -28,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=17" />
+  <link rel="stylesheet" href="styles.css?v=25" />
 
   <!-- preload the LCP hero image (the one that matches this viewport) -->
   <link rel="preload" as="image" media="(max-width: 768px)" href="assets/hero-phone.webp" />
@@ -138,8 +142,8 @@
     </div>
 
     <div class="hero__inner">
-      <div class="hero__cta-wrap"><a href="#waitlist" class="hero__cta">Join Waitlist</a></div>
-      <h1 class="hero__title">You have the clothes,<br />We have the outfits!</h1>
+      <div class="hero__cta-wrap" data-reveal="up"><a href="#waitlist" class="hero__cta">Join Waitlist</a></div>
+      <h1 class="hero__title" data-reveal="up" style="--reveal-delay:80ms">You have the clothes,<br />We have the outfits!</h1>
       <!-- One <picture> that swaps by viewport so only ONE hero image downloads:
            phones get the small single-phone shot, desktop gets the two-phone shot. -->
       <picture>
@@ -154,9 +158,9 @@
   <!-- ===================== ABOUT ===================== -->
   <section class="about" id="about">
     <div class="about__decor" aria-hidden="true"></div>
-    <h2 class="about__title">About us</h2>
+    <h2 class="about__title" data-reveal="left">About us</h2>
     <div class="about__grid">
-      <p class="about__text">
+      <p class="about__text" data-reveal="left" style="--reveal-delay:80ms">
         We started with a simple question: how often do you feel like you have nothing
         to wear, even with a wardrobe full of clothes? The answer we heard most: “all the
         time.” That’s why we are building Attira — to help you rediscover outfits from
@@ -164,10 +168,10 @@
         make getting dressed feel effortless and fun again. We want to turn your wardrobe
         into a catalogue of possibilities you didn’t even know you had.
       </p>
-      <div class="about__media">
+      <div class="about__media" data-reveal="right">
         <picture>
-          <source type="image/webp" srcset="assets/about-rack.webp" />
-          <img src="assets/about-rack.png" width="736" height="981" loading="lazy" alt="A clothing rack of curated garments below framed posters." />
+          <source type="image/webp" srcset="assets/about-rack.webp 1x, assets/about-rack-2x.webp 2x" />
+          <img src="assets/about-rack.png" width="736" height="981" loading="lazy" decoding="async" alt="A clothing rack of curated garments below framed posters." />
         </picture>
       </div>
     </div>
@@ -181,93 +185,78 @@
 
     <div class="discover__scroll" id="discoverScroll">
      <div class="discover__sticky">
-    <h2 class="discover__heading">Your wardrobe, <em>upgraded</em>.</h2>
+    <h2 class="discover__heading" data-reveal="up">Your wardrobe, <em>upgraded</em>.</h2>
 
     <div class="discover__showcase">
-      <!-- LEFT: numbered stepper navigation -->
-      <ol class="stepper" id="stepper">
-        <li class="stepper__item">
-          <button class="step is-active" type="button" data-step="0" aria-label="Discover">
-            <span class="step__num">1</span><span class="step__label">Discover</span>
+      <!-- LEFT: Apple-style accordion — each row expands its copy inline -->
+      <ol class="feature-acc" id="stepper" data-reveal="left">
+        <li class="feature is-active" data-step="0">
+          <button class="feature__head" type="button" aria-expanded="true">
+            <span class="feature__label">Discover</span>
+            <span class="feature__icon" aria-hidden="true"></span>
           </button>
+          <div class="feature__panel"><div class="feature__panel-inner">
+            <p class="feature__desc">Explore outfit ideas curated from real wardrobes, trends, moods, and occasions — personalised to your style.</p>
+          </div></div>
         </li>
-        <li class="stepper__item">
-          <button class="step" type="button" data-step="1" aria-label="Wardrobe">
-            <span class="step__num">2</span><span class="step__label">Wardrobe</span>
+        <li class="feature" data-step="1">
+          <button class="feature__head" type="button" aria-expanded="false">
+            <span class="feature__label">Wardrobe</span>
+            <span class="feature__icon" aria-hidden="true"></span>
           </button>
+          <div class="feature__panel"><div class="feature__panel-inner">
+            <p class="feature__desc">Your entire closet, digitised and organised — every piece you own, a tap away.</p>
+          </div></div>
         </li>
-        <li class="stepper__item">
-          <button class="step" type="button" data-step="2" aria-label="Aira">
-            <span class="step__num">3</span><span class="step__label">Aira</span>
+        <li class="feature" data-step="2">
+          <button class="feature__head" type="button" aria-expanded="false">
+            <span class="feature__label">Aira</span>
+            <span class="feature__icon" aria-hidden="true"></span>
           </button>
+          <div class="feature__panel"><div class="feature__panel-inner">
+            <p class="feature__desc">Chat with Aira, your personal AI stylist, for looks that fit your day and mood.</p>
+          </div></div>
         </li>
-        <li class="stepper__item">
-          <button class="step" type="button" data-step="3" aria-label="Saved">
-            <span class="step__num">4</span><span class="step__label">Saved</span>
+        <li class="feature" data-step="3">
+          <button class="feature__head" type="button" aria-expanded="false">
+            <span class="feature__label">Saved</span>
+            <span class="feature__icon" aria-hidden="true"></span>
           </button>
+          <div class="feature__panel"><div class="feature__panel-inner">
+            <p class="feature__desc">Keep your favourite outfits in one place and build looks you'll actually wear.</p>
+          </div></div>
         </li>
-        <li class="stepper__item">
-          <button class="step" type="button" data-step="4" aria-label="Account">
-            <span class="step__num">5</span><span class="step__label">Account</span>
+        <li class="feature" data-step="4">
+          <button class="feature__head" type="button" aria-expanded="false">
+            <span class="feature__label">Profile</span>
+            <span class="feature__icon" aria-hidden="true"></span>
+          </button>
+          <div class="feature__panel"><div class="feature__panel-inner">
+            <p class="feature__desc">Your Style DNA and wardrobe insights, tuned to how you really dress.</p>
+          </div></div>
+        </li>
+        <li class="feature-acc__nav">
+          <button class="acc-chevron" id="accPrev" type="button" aria-label="Previous feature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+          </button>
+          <button class="acc-chevron" id="accNext" type="button" aria-label="Next feature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
         </li>
       </ol>
 
-      <!-- MIDDLE: active step copy (updated by JS) -->
-      <div class="discover__copy">
-        <h3 class="discover__step-title" id="stepTitle">Discover<em>.</em></h3>
-        <p class="discover__step-desc" id="stepDesc">Explore outfit ideas curated from real wardrobes, trends, moods, and occasions — personalised to your style.</p>
-      </div>
-
       <!-- RIGHT: phone — full app screenshots; tap the tab bar to switch screens -->
-      <div class="discover__phone">
+      <div class="discover__phone" data-reveal="right" style="--reveal-delay:120ms">
         <!-- one static phone; only the inner screenshot + active tab change -->
         <div class="device">
           <div class="device__screen">
             <div class="device__shots" id="screenShots">
-              <picture>
-                <source type="image/webp" srcset="assets/content-discover.webp" />
-                <img class="device__shot is-active" data-step="0" src="assets/content-discover.png" width="398" height="775" alt="The Attira app — Discover screen" />
-              </picture>
-              <picture>
-                <source type="image/webp" srcset="assets/content-wardrobe.webp" />
-                <img class="device__shot" data-step="1" src="assets/content-wardrobe.png" width="540" height="1132" loading="lazy" alt="The Attira app — Wardrobe screen" />
-              </picture>
-              <picture>
-                <source type="image/webp" srcset="assets/content-aira.webp" />
-                <img class="device__shot" data-step="2" src="assets/content-aira.png" width="308" height="578" loading="lazy" alt="The Attira app — Aira screen" />
-              </picture>
-              <picture>
-                <source type="image/webp" srcset="assets/content-saved.webp" />
-                <img class="device__shot" data-step="3" src="assets/content-saved.png" width="308" height="578" loading="lazy" alt="The Attira app — Saved screen" />
-              </picture>
-              <picture>
-                <source type="image/webp" srcset="assets/content-account.webp" />
-                <img class="device__shot" data-step="4" src="assets/content-account.png" width="308" height="578" loading="lazy" alt="The Attira app — Account screen" />
-              </picture>
+              <img class="device__shot is-active" data-step="0" src="assets/Discover.jpeg" width="738" height="1600" alt="The Attira app — Discover screen" />
+              <img class="device__shot" data-step="1" src="assets/Wardrobe.jpeg" width="738" height="1600" loading="lazy" alt="The Attira app — Wardrobe screen" />
+              <img class="device__shot" data-step="2" src="assets/Aira.png" width="740" height="1600" loading="lazy" alt="The Attira app — Aira, your personal AI stylist" />
+              <img class="device__shot" data-step="3" src="assets/Saved.jpeg" width="738" height="1600" loading="lazy" alt="The Attira app — Saved screen" />
+              <img class="device__shot" data-step="4" src="assets/Profile.jpeg" width="738" height="1600" loading="lazy" alt="The Attira app — Profile screen" />
             </div>
-            <nav class="device__tabs" id="phoneTabs" aria-label="App sections">
-              <button class="ptab is-active" type="button" data-step="0" aria-label="Discover">
-                <span class="ptab__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/></svg></span>
-                <span>Discover</span>
-              </button>
-              <button class="ptab" type="button" data-step="1" aria-label="Wardrobe">
-                <span class="ptab__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="1.6"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="9" y1="11" x2="9" y2="13"/><line x1="15" y1="11" x2="15" y2="13"/></svg></span>
-                <span>Wardrobe</span>
-              </button>
-              <button class="ptab ptab--aira" type="button" data-step="2" aria-label="Aira">
-                <span class="ptab__icon">A</span>
-                <span>Aira</span>
-              </button>
-              <button class="ptab" type="button" data-step="3" aria-label="Saved">
-                <span class="ptab__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20s-7-4.4-9.2-8.8C1.1 7.7 3 4.6 6.1 4.8 8.3 4.9 9.9 6.4 12 8.6c2.1-2.2 3.7-3.7 5.9-3.8 3.1-.2 5 2.9 3.3 6.4C19 15.6 12 20 12 20z"/></svg></span>
-                <span>Saved</span>
-              </button>
-              <button class="ptab" type="button" data-step="4" aria-label="Account">
-                <span class="ptab__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg></span>
-                <span>Account</span>
-              </button>
-            </nav>
           </div>
         </div>
       </div>
@@ -279,10 +268,10 @@
   <!-- ===================== FEATURES / WAITLIST ===================== -->
   <section class="waitlist" id="features">
     <div class="waitlist__inner" id="waitlist">
-      <h2 class="waitlist__title">Get early access</h2>
-      <p class="waitlist__sub">Be the first to see how Attira looks and help us shape it for you and many more.</p>
+      <h2 class="waitlist__title" data-reveal="up">Get early access</h2>
+      <p class="waitlist__sub" data-reveal="up" style="--reveal-delay:80ms">Be the first to see how Attira looks and help us shape it for you and many more.</p>
 
-      <form class="waitlist__form" id="waitlistForm" novalidate>
+      <form class="waitlist__form" id="waitlistForm" data-reveal="up" style="--reveal-delay:160ms" novalidate>
         <label for="email" class="visually-hidden">Email address</label>
         <input
           type="email"
@@ -301,17 +290,17 @@
   <!-- ===================== FOOTER ===================== -->
   <footer class="footer">
     <div class="footer__top">
-      <div class="footer__brand">Attira</div>
-      <div class="footer__col">
+      <div class="footer__brand" data-reveal="up">Attira</div>
+      <div class="footer__col" data-reveal="up" style="--reveal-delay:80ms">
         <h4>Company</h4>
         <a href="#about">About Us</a>
         <a href="contact.html">Contact</a>
       </div>
-      <div class="footer__col">
+      <div class="footer__col" data-reveal="up" style="--reveal-delay:140ms">
         <h4>Resources</h4>
         <a href="faq.html">FAQ</a>
       </div>
-      <div class="footer__col">
+      <div class="footer__col" data-reveal="up" style="--reveal-delay:200ms">
         <h4>Legal</h4>
         <a href="privacy.html">Privacy Policy</a>
         <a href="terms.html">Terms &amp; Conditions</a>
@@ -326,6 +315,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=2" defer></script>
+  <script src="script.js?v=5" defer></script>
 </body>
 </html>

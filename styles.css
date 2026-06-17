@@ -929,7 +929,7 @@ textarea:focus-visible {
      contained inside its column with margin so neither the frame nor its soft
      shadow reaches the section's clip box (no overflow, no clipping). */
   .discover__showcase {
-    grid-template-columns: 52% 1fr;   /* text left, phone right — side by side */
+    grid-template-columns: 46% 1fr;   /* text left, phone right — phone a bit bigger */
     gap: 14px;
     align-items: center;
   }

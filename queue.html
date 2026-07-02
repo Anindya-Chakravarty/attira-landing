@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The waitlist queue — Attira</title>
+  <meta name="description" content="See everyone on the Attira waitlist, in the order they joined." />
+  <link rel="canonical" href="https://attira.org/queue" />
+  <!-- Public list of (masked) members — keep it out of search indexes. -->
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#fffce8" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+
+  <!-- PostHog (client) — self-hosted so it passes the strict script-src 'self' CSP. -->
+  <script src="ph-init.js?v=1"></script>
+
+  <!-- Open Graph / Twitter (generic — drives newcomers to the signup) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Attira" />
+  <meta property="og:title" content="The Attira waitlist queue" />
+  <meta property="og:description" content="Everyone on the Attira waitlist, in the order they joined." />
+  <meta property="og:url" content="https://attira.org/queue" />
+  <meta property="og:image" content="https://attira.org/assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Attira waitlist queue" />
+  <meta name="twitter:description" content="Everyone on the Attira waitlist, in the order they joined." />
+  <meta name="twitter:image" content="https://attira.org/assets/og-image.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="theme-init.js?v=2"></script>
+  <link rel="stylesheet" href="styles.css?v=63" />
+</head>
+<body>
+  <!-- ===================== HEADER / NAV ===================== -->
+  <header class="nav">
+    <a href="/" class="nav__logo">ATTIRA</a>
+    <nav class="nav__links" id="navLinks">
+      <a href="/#about">About</a>
+      <a href="/#discover">Features</a>
+    </nav>
+    <a href="/#waitlist" class="nav__cta">Get Access Now</a>
+  </header>
+
+  <!-- ===================== QUEUE ===================== -->
+  <section class="waitlist" id="features">
+    <div class="waitlist__inner" id="waitlist">
+      <h1 class="waitlist__title">The waitlist queue</h1>
+      <p class="waitlist__sub" id="queueSub">Everyone on the list, in the order they joined.</p>
+
+      <p class="waitlist__msg" id="queueMsg" role="status" aria-live="polite"></p>
+
+      <!-- The queue, oldest first (masked emails) -->
+      <div class="board queue" id="queueBoard" hidden>
+        <div class="board__head">In line</div>
+        <ul class="board__list" id="queueList"></ul>
+        <button type="button" class="board__more" id="queueMore" hidden>Load more</button>
+      </div>
+
+      <p class="waitlist__invited" id="joinPrompt">
+        Not on the list yet? <a href="/#waitlist">Join the waitlist →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer__top">
+      <div class="footer__brand">Attira</div>
+      <div class="footer__col">
+        <h4>Company</h4>
+        <a href="/#about">About Us</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+      <div class="footer__col">
+        <h4>Resources</h4>
+        <a href="/faq.html">FAQ</a>
+        <a href="/queue.html">Waitlist queue</a>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Attira. All rights reserved.</span>
+      <div class="footer__social">
+        <a href="https://www.instagram.com/attira.closet" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://www.linkedin.com/company/attira/people/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="queue.js?v=1" defer></script>
+</body>
+</html>

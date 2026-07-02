@@ -8,7 +8,10 @@ const fs = require("fs");
 const path = require("path");
 const waitlist = require("./db");
 
-const rows = waitlist.exportAll();
+// By default export only genuine signups. Pass --all to include seed rows
+// (the synthetic social-proof entries created by scripts/seed-waitlist.js).
+const includeSeeds = process.argv.includes("--all");
+const rows = includeSeeds ? waitlist.exportAll() : waitlist.exportReal();
 
 function csvEscape(v) {
   if (v === null || v === undefined) return "";

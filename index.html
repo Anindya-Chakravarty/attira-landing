@@ -7,7 +7,8 @@
   <meta name="description" content="Attira turns your wardrobe into a catalogue of possibilities. Rediscover outfits from pieces you already own. Join the waitlist." />
   <link rel="canonical" href="https://attira.org/" />
   <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#fffce8" />
+  <meta name="theme-color" content="#fffce8" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
 
@@ -32,11 +33,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=29" />
+  <!-- Apply the saved light/dark theme before first paint (external, CSP-safe). -->
+  <script src="theme-init.js?v=2"></script>
+  <link rel="stylesheet" href="styles.css?v=63" />
 
-  <!-- preload the LCP hero image (the one that matches this viewport) -->
-  <link rel="preload" as="image" media="(max-width: 768px)" href="assets/hero-phone.webp" />
-  <link rel="preload" as="image" media="(min-width: 769px)" href="assets/hero-phones.webp" />
+  <!-- preload the composed hero image used in the Figma frame -->
+  <link rel="preload" as="image" href="assets/hero-phones.webp?v=3" fetchpriority="high" />
 
   <script type="application/ld+json">
   {
@@ -113,6 +115,7 @@
   </script>
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to content</a>
   <!-- ===================== HEADER / NAV ===================== -->
   <header class="nav">
     <a href="#top" class="nav__logo">ATTIRA</a>
@@ -122,36 +125,28 @@
       <a href="#discover">Features</a>
     </nav>
 
-    <a href="#waitlist" class="nav__cta">Join Waitlist</a>
+    <a href="#waitlist" class="nav__cta">Get Access Now</a>
   </header>
 
+  <main id="main">
   <!-- ===================== HERO ===================== -->
   <section class="hero" id="top">
     <div class="hero__stripes" aria-hidden="true"></div>
 
-    <!-- scrolling tagline ribbon -->
-    <div class="ribbon" aria-hidden="true">
-      <div class="ribbon__track">
-        <span class="ribbon__set">
-          <em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i><em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i><em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i>
-        </span>
-        <span class="ribbon__set">
-          <em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i><em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i><em>AI Styling</em><i>✦</i><em>Smart Wardrobe</em><i>✦</i><em>Daily Outfits</em><i>✦</i><em>Personal Stylist</em><i>✦</i><em>Style Intelligence</em><i>✦</i>
-        </span>
-      </div>
-    </div>
-
     <div class="hero__inner">
-      <div class="hero__cta-wrap" data-reveal="up"><a href="#waitlist" class="hero__cta">Join Waitlist</a></div>
       <h1 class="hero__title" data-reveal="up" style="--reveal-delay:80ms">You have the clothes,<br />We have the outfits!</h1>
-      <!-- One <picture> that swaps by viewport so only ONE hero image downloads:
-           phones get the small single-phone shot, desktop gets the two-phone shot. -->
-      <picture>
-        <source media="(max-width: 768px)" type="image/webp" srcset="assets/hero-phone.webp" />
-        <source media="(max-width: 768px)" srcset="assets/hero-phone.png" />
-        <source type="image/webp" srcset="assets/hero-phones.webp" />
-        <img class="hero__image" src="assets/hero-phones.png" fetchpriority="high" decoding="async" alt="The Attira app — a personal AI stylist and your digital wardrobe." />
-      </picture>
+      <div class="hero__media" data-reveal="up" style="--reveal-delay:160ms">
+        <picture>
+          <!-- mobile: single upright phone (Figma); desktop: two-phone composite -->
+          <source media="(max-width: 768px)" type="image/webp" srcset="assets/hero-phone.webp" />
+          <source media="(max-width: 768px)" srcset="assets/hero-phone.png" />
+          <source type="image/webp" srcset="assets/hero-phones.webp?v=3" />
+          <img src="assets/hero-phones.png?v=3" width="1536" height="1024" decoding="async" fetchpriority="high" alt="Two Attira app screens showing the personal stylist and wardrobe views" />
+        </picture>
+      </div>
+      <div class="hero__cta-wrap" data-reveal="up" style="--reveal-delay:240ms">
+        <a href="#waitlist" class="hero__cta">Get Access Now</a>
+      </div>
     </div>
   </section>
 
@@ -247,18 +242,39 @@
 
       <!-- RIGHT: phone — full app screenshots; tap the tab bar to switch screens -->
       <div class="discover__phone" data-reveal="right" style="--reveal-delay:120ms">
+       <div class="device-wrap">
         <!-- one static phone; only the inner screenshot + active tab change -->
         <div class="device">
+          <!-- decorative side buttons (volume ×2 left, power right) -->
+          <span class="device__btn device__btn--volup" aria-hidden="true"></span>
+          <span class="device__btn device__btn--voldn" aria-hidden="true"></span>
+          <span class="device__btn device__btn--power" aria-hidden="true"></span>
           <div class="device__screen">
             <div class="device__shots" id="screenShots">
-              <img class="device__shot is-active" data-step="0" src="assets/Discover.jpeg?v=2" width="738" height="1600" alt="The Attira app — Discover screen" />
-              <img class="device__shot" data-step="1" src="assets/Wardrobe.jpeg?v=2" width="590" height="1310" loading="lazy" alt="The Attira app — Wardrobe screen" />
-              <img class="device__shot" data-step="2" src="assets/Aira.png?v=2" width="740" height="1530" loading="lazy" alt="The Attira app — Aira, your personal AI stylist" />
-              <img class="device__shot" data-step="3" src="assets/Saved.jpeg?v=2" width="738" height="1600" loading="lazy" alt="The Attira app — Saved screen" />
-              <img class="device__shot" data-step="4" src="assets/Profile.jpeg?v=2" width="738" height="1600" loading="lazy" alt="The Attira app — Profile screen" />
+              <img class="device__shot is-active" data-step="0" src="assets/July_alpha/Explore_light.jpeg" data-src-light="assets/July_alpha/Explore_light.jpeg" data-src-dark="assets/July_alpha/Explore_dark.jpeg" width="738" height="1600" alt="The Attira app — Discover screen" />
+              <img class="device__shot" data-step="1" src="assets/July_alpha/Wardrobe_light.jpeg" data-src-light="assets/July_alpha/Wardrobe_light.jpeg" data-src-dark="assets/July_alpha/Wardrobe_Dark.jpeg" width="738" height="1600" loading="lazy" alt="The Attira app — Wardrobe screen" />
+              <img class="device__shot" data-step="2" src="assets/July_alpha/Aira_light.jpeg" data-src-light="assets/July_alpha/Aira_light.jpeg" data-src-dark="assets/July_alpha/Aira_Dark.jpeg" width="738" height="1600" loading="lazy" alt="The Attira app — Aira, your personal AI stylist" />
+              <img class="device__shot" data-step="3" src="assets/July_alpha/Saved_light.jpeg" data-src-light="assets/July_alpha/Saved_light.jpeg" data-src-dark="assets/July_alpha/Saved_Dark.jpeg" width="738" height="1600" loading="lazy" alt="The Attira app — Saved screen" />
+              <img class="device__shot" data-step="4" src="assets/July_alpha/Profile_light.jpeg" data-src-light="assets/July_alpha/Profile_light.jpeg" data-src-dark="assets/July_alpha/Profile_dark.jpeg" width="738" height="1600" loading="lazy" alt="The Attira app — Profile screen" />
             </div>
           </div>
         </div>
+
+        <!-- vertical light/dark slider pinned to the device's right edge; mirrors
+             the navbar toggle and drives the same theme state (hidden on mobile). -->
+        <button class="theme-slider" id="themeSlider" type="button"
+                aria-label="Switch between light and dark mode" aria-pressed="false"
+                title="Light / dark mode">
+          <svg class="theme-slider__icon theme-slider__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <span class="theme-slider__knob" aria-hidden="true"></span>
+          <svg class="theme-slider__icon theme-slider__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+       </div>
       </div>
     </div>
      </div>
@@ -269,7 +285,11 @@
   <section class="waitlist" id="features">
     <div class="waitlist__inner" id="waitlist">
       <h2 class="waitlist__title" data-reveal="up">Get early access</h2>
-      <p class="waitlist__sub" data-reveal="up" style="--reveal-delay:80ms">Be the first to see how Attira looks and help us shape it for you and many more.</p>
+      <p class="waitlist__sub" data-reveal="up" style="--reveal-delay:80ms">Be the first to see how Attira looks and help us shape it for you and many more. Refer 3 friends to jump the queue and unlock priority access.</p>
+
+      <p class="waitlist__invited" id="waitlistInvited" hidden>
+        Invited by <span class="waitlist__invited-code" id="waitlistInvitedCode"></span>
+      </p>
 
       <form class="waitlist__form" id="waitlistForm" data-reveal="up" style="--reveal-delay:160ms" novalidate>
         <label for="email" class="visually-hidden">Email address</label>
@@ -284,26 +304,77 @@
         <button type="submit" class="waitlist__submit">submit</button>
       </form>
       <p class="waitlist__msg" id="waitlistMsg" role="status" aria-live="polite"></p>
+
+      <!-- Personal referral dashboard — shown after signup / on return -->
+      <div class="dash" id="waitlistDash" hidden>
+        <div class="dash__panel">
+          <div class="dash__stats">
+            <div class="dash__stat">
+              <span class="dash__label">Your position</span>
+              <span class="dash__value" id="dashPosition">#—</span>
+            </div>
+            <div class="dash__stat dash__stat--right">
+              <span class="dash__label">Referrals</span>
+              <span class="dash__value" id="dashReferrals">0</span>
+            </div>
+          </div>
+
+          <p class="dash__reward" id="dashReward" hidden></p>
+
+          <div class="dash__progress">
+            <div class="dash__progress-head">
+              <span id="dashProgressText">Refer 3 friends to unlock priority access</span>
+              <span class="dash__progress-count" id="dashProgressCount">0/3</span>
+            </div>
+            <div class="dash__bar"><div class="dash__bar-fill" id="dashBarFill" style="width:0%"></div></div>
+          </div>
+
+          <div class="dash__share">
+            <span class="dash__label">Your share link</span>
+            <div class="dash__link-row">
+              <input type="text" class="dash__link" id="dashLink" readonly aria-label="Your share link" />
+              <button type="button" class="dash__copy" id="dashCopy" aria-label="Copy share link">Copy</button>
+            </div>
+            <p class="dash__code">Code: <span id="dashCode"></span></p>
+          </div>
+
+          <button type="button" class="dash__story" id="dashStory">
+            <span class="dash__story-icon" aria-hidden="true">✦</span>
+            Share to Instagram / TikTok story
+          </button>
+          <p class="dash__story-hint" id="dashStoryHint" hidden></p>
+
+          <div class="dash__buttons">
+            <a class="dash__btn" id="dashWhatsApp" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <a class="dash__btn" id="dashX" target="_blank" rel="noopener noreferrer">Share on X</a>
+            <a class="dash__btn" id="dashEmail" target="_blank" rel="noopener noreferrer">Email</a>
+          </div>
+        </div>
+      </div>
+
+      <a href="/queue.html" class="waitlist__queue-btn">View Waitlist</a>
     </div>
   </section>
+  </main>
 
   <!-- ===================== FOOTER ===================== -->
   <footer class="footer">
     <div class="footer__top">
       <div class="footer__brand" data-reveal="up">Attira</div>
       <div class="footer__col" data-reveal="up" style="--reveal-delay:80ms">
-        <h4>Company</h4>
+        <h3>Company</h3>
         <a href="#about">About Us</a>
-        <a href="contact.html">Contact</a>
+        <a href="/contact.html">Contact</a>
       </div>
       <div class="footer__col" data-reveal="up" style="--reveal-delay:140ms">
-        <h4>Resources</h4>
-        <a href="faq.html">FAQ</a>
+        <h3>Resources</h3>
+        <a href="/faq.html">FAQ</a>
+        <a href="/queue.html">Waitlist queue</a>
       </div>
       <div class="footer__col" data-reveal="up" style="--reveal-delay:200ms">
-        <h4>Legal</h4>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms &amp; Conditions</a>
+        <h3>Legal</h3>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms &amp; Conditions</a>
       </div>
     </div>
     <div class="footer__bottom">
@@ -315,6 +386,8 @@
     </div>
   </footer>
 
-  <script src="script.js?v=5" defer></script>
+  <script src="vendor/qrcode.js?v=1" defer></script>
+  <script src="share-card.js?v=1" defer></script>
+  <script src="script.js?v=13" defer></script>
 </body>
 </html>

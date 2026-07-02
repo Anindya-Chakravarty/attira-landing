@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your place in line — Attira</title>
+  <meta name="description" content="See your spot on the Attira waitlist, watch the leaderboard, and refer friends to climb the queue." />
+  <link rel="canonical" href="https://attira.org/status" />
+  <!-- Utility page keyed to a personal code — keep it out of search indexes. -->
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#fffce8" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+
+  <!-- PostHog (client) — self-hosted so it passes the strict script-src 'self' CSP. -->
+  <script src="ph-init.js?v=1"></script>
+
+  <!-- Open Graph / Twitter (generic — drives newcomers to the signup) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Attira" />
+  <meta property="og:title" content="Climb the Attira waitlist" />
+  <meta property="og:description" content="Refer friends, move up the queue, and get early access to Attira first." />
+  <meta property="og:url" content="https://attira.org/status" />
+  <meta property="og:image" content="https://attira.org/assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Climb the Attira waitlist" />
+  <meta name="twitter:description" content="Refer friends, move up the queue, and get early access to Attira first." />
+  <meta name="twitter:image" content="https://attira.org/assets/og-image.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="theme-init.js?v=2"></script>
+  <link rel="stylesheet" href="styles.css?v=63" />
+</head>
+<body>
+  <!-- ===================== HEADER / NAV ===================== -->
+  <header class="nav">
+    <a href="/" class="nav__logo">ATTIRA</a>
+    <nav class="nav__links" id="navLinks">
+      <a href="/#about">About</a>
+      <a href="/#discover">Features</a>
+    </nav>
+    <a href="/#waitlist" class="nav__cta">Get Access Now</a>
+  </header>
+
+  <!-- ===================== STATUS ===================== -->
+  <section class="waitlist" id="features">
+    <div class="waitlist__inner" id="waitlist">
+      <h1 class="waitlist__title">Your place in line</h1>
+      <p class="waitlist__sub" id="statusSub">Refer friends, climb the queue, and get into Attira first.</p>
+
+      <p class="waitlist__msg" id="statusMsg" role="status" aria-live="polite"></p>
+
+      <!-- Code-entry fallback — shown when there's no code in the URL or storage -->
+      <form class="waitlist__form" id="codeForm" novalidate hidden>
+        <label for="codeInput" class="visually-hidden">Your waitlist code</label>
+        <input
+          type="text"
+          id="codeInput"
+          class="waitlist__input"
+          placeholder="ATR-XXXXX"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          maxlength="9"
+          required
+        />
+        <button type="submit" class="waitlist__submit">find my spot</button>
+      </form>
+      <p class="waitlist__invited" id="joinPrompt" hidden>
+        Not on the list yet? <a href="/#waitlist">Join the waitlist →</a>
+      </p>
+
+      <!-- Personal referral dashboard — same structure/classes as the homepage -->
+      <div class="dash" id="waitlistDash" hidden>
+        <div class="dash__panel">
+          <div class="dash__stats">
+            <div class="dash__stat">
+              <span class="dash__label">Your position</span>
+              <span class="dash__value" id="dashPosition">#—</span>
+            </div>
+            <div class="dash__stat dash__stat--right">
+              <span class="dash__label">Referrals</span>
+              <span class="dash__value" id="dashReferrals">0</span>
+            </div>
+          </div>
+
+          <p class="dash__reward" id="dashReward" hidden></p>
+
+          <div class="dash__progress">
+            <div class="dash__progress-head">
+              <span id="dashProgressText">Refer 3 friends to unlock priority access</span>
+              <span class="dash__progress-count" id="dashProgressCount">0/3</span>
+            </div>
+            <div class="dash__bar"><div class="dash__bar-fill" id="dashBarFill"></div></div>
+          </div>
+
+          <div class="dash__share">
+            <span class="dash__label">Your share link</span>
+            <div class="dash__link-row">
+              <input type="text" class="dash__link" id="dashLink" readonly aria-label="Your share link" />
+              <button type="button" class="dash__copy" id="dashCopy" aria-label="Copy share link">Copy</button>
+            </div>
+            <p class="dash__code">Code: <span id="dashCode"></span></p>
+          </div>
+
+          <button type="button" class="dash__story" id="dashStory">
+            <span class="dash__story-icon" aria-hidden="true">✦</span>
+            Share to Instagram / TikTok story
+          </button>
+          <p class="dash__story-hint" id="dashStoryHint" hidden></p>
+
+          <div class="dash__buttons">
+            <a class="dash__btn" id="dashWhatsApp" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <a class="dash__btn" id="dashX" target="_blank" rel="noopener noreferrer">Share on X</a>
+            <a class="dash__btn" id="dashEmail" target="_blank" rel="noopener noreferrer">Email</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public leaderboard — top referrers (masked emails) -->
+      <div class="board" id="waitlistBoard" hidden>
+        <div class="board__head">Top referrers</div>
+        <ul class="board__list" id="boardList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer__top">
+      <div class="footer__brand">Attira</div>
+      <div class="footer__col">
+        <h4>Company</h4>
+        <a href="/#about">About Us</a>
+        <a href="/contact.html">Contact</a>
+      </div>
+      <div class="footer__col">
+        <h4>Resources</h4>
+        <a href="/faq.html">FAQ</a>
+        <a href="/queue.html">Waitlist queue</a>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Attira. All rights reserved.</span>
+      <div class="footer__social">
+        <a href="https://www.instagram.com/attira.closet" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://www.linkedin.com/company/attira/people/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="vendor/qrcode.js?v=1" defer></script>
+  <script src="share-card.js?v=1" defer></script>
+  <script src="status.js?v=2" defer></script>
+</body>
+</html>

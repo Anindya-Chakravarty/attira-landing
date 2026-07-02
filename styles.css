@@ -20,12 +20,24 @@
   --maxw: 1440px;
   --pad: clamp(20px, 5vw, 60px);
 
+  /* one dial for card/input/button corners — barely rounded, plain + simple */
+  --radius: 4px;
+
   /* motion system — one consistent easing/timing scale across the whole site */
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);   /* refined settle */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* gentle overshoot for hovers */
   --dur-fast: 0.18s;
   --dur-mid: 0.4s;
   --dur-slow: 0.7s;
+
+  /* type scale — one source of truth for headings + body, so equivalent
+     elements stay the same size instead of drifting per-class */
+  --fs-display: clamp(40px, 6vw, 72px);   /* hero + top-level section headers */
+  --fs-h2:      clamp(28px, 3.4vw, 40px); /* content / sub-section headers (legal, contact) */
+  --fs-h3:      clamp(20px, 2.2vw, 26px); /* small headers, FAQ questions */
+  --fs-body:    clamp(15px, 1.5vw, 18px); /* body copy */
+  --fs-small:   clamp(13px, 1.2vw, 15px); /* captions, helper text */
+  --fs-eyebrow: clamp(11px, 1.2vw, 13px); /* uppercase Jost labels */
 }
 
 * { box-sizing: border-box; }
@@ -68,6 +80,13 @@ html.js-reveal [data-reveal] {
 html.js-reveal [data-reveal="up"]    { transform: translateY(28px); }
 html.js-reveal [data-reveal="left"]  { transform: translateX(-32px); }
 html.js-reveal [data-reveal="right"] { transform: translateX(32px); }
+/* On desktop the left-reveal start state (-32px) pulls headings/copy toward the
+   viewport edge; at the low end of desktop (~1024px, side padding ≈51px) that
+   left only ~19px of clearance — under 24px. Clamp the start offset on desktop so
+   the leftmost text always keeps ≥24px from the edge (mobile is unaffected). */
+@media (min-width: 1024px) {
+  html.js-reveal [data-reveal="left"] { transform: translateX(-20px); }
+}
 html.js-reveal [data-reveal].is-visible {
   opacity: 1;
   transform: none;
@@ -86,6 +105,28 @@ html.js-reveal [data-reveal].is-visible {
   white-space: nowrap;
   border: 0;
 }
+
+/* Branded text selection (replaces the default browser blue). */
+::selection { background: var(--orange); color: #fff; }
+::-moz-selection { background: var(--orange); color: #fff; }
+
+/* Skip-to-content link — off-screen until keyboard-focused (no visual change
+   to the page otherwise). */
+.skip-link {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -120%);
+  z-index: 100;
+  padding: 10px 18px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--orange);
+  color: #fff;
+  font: 600 14px/1 "DM Sans", system-ui, sans-serif;
+  text-decoration: none;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.skip-link:focus { transform: translate(-50%, 0); outline: none; }
 
 /* Visible keyboard-focus ring for interactive elements. */
 a:focus-visible,
@@ -154,7 +195,7 @@ textarea:focus-visible {
   font-weight: 700;
   text-decoration: none;
   padding: 14px 28px;
-  border-radius: 10px;
+  border-radius: var(--radius);
   transition: transform var(--dur-fast) var(--ease-spring),
     box-shadow var(--dur-fast) var(--ease-out);
 }
@@ -164,6 +205,50 @@ textarea:focus-visible {
   box-shadow: 0 8px 22px rgba(224, 77, 27, 0.25);
 }
 .nav__cta:active { transform: translateY(0) scale(0.98); }
+
+/* left cluster: theme toggle + wordmark sit together at the far left so the
+   absolutely-centered nav links and the right-hand CTA keep their positions. */
+.nav__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ----- sun/moon theme toggle ----- */
+/* 36×36 hit target, ~19px icon, transparent in light, subtle surface in dark.
+   The two icons are stacked and cross-fade/rotate (≤200ms) via the theme attr. */
+.theme-toggle {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: none;
+  color: #000;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.theme-toggle:hover { background: rgba(61, 54, 50, 0.08); }
+.theme-toggle__icon {
+  position: absolute;
+  width: 19px;
+  height: 19px;
+  transition: opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+/* light mode → moon visible (tap to go dark); sun tucked away */
+.theme-toggle__icon--sun  { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+.theme-toggle__icon--moon { opacity: 1; transform: none; }
+/* dark mode → sun visible (tap to go light); moon tucked away */
+html[data-theme="dark"] .theme-toggle__icon--sun  { opacity: 1; transform: none; }
+html[data-theme="dark"] .theme-toggle__icon--moon { opacity: 0; transform: rotate(90deg) scale(0.5); }
 
 .nav__toggle {
   display: none;
@@ -189,7 +274,7 @@ textarea:focus-visible {
 .hero {
   position: relative;
   overflow: hidden;
-  height: 100vh;
+  min-height: calc(100svh - 95px);
   display: flex;
   flex-direction: column;
 }
@@ -246,37 +331,55 @@ textarea:focus-visible {
 .hero__inner {
   position: relative;
   z-index: 2;
-  flex: 1;
-  min-height: 0;
+  flex: 1;                      /* fill the 100svh hero so content can center */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: center;     /* center title + phones to fill the device screen */
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 40px var(--pad) 0;
+  padding: clamp(88px, 7vw, 110px) var(--pad) clamp(24px, 4vw, 44px);
   text-align: center;
+  gap: 0;
 }
 
 .hero__title {
   font-family: "Inria Serif", serif;
   font-style: italic;
   font-weight: 700;
-  color: var(--ink);
-  font-size: clamp(32px, 4.5vw, 64px);
-  line-height: 1.08;
-  margin: 0 0 24px;
+  color: var(--ink);                       /* dark brown in light, cream in dark (auto-flips) */
+  font-size: clamp(40px, 6.2vw, 120px);    /* large, dramatic like the reference */
+  line-height: 1.05;
+  margin: 0 0 clamp(16px, 2vw, 28px);      /* gap below the title, above the phones */
+  max-width: none;                         /* let each clause stay on one wide line (<br/>) */
+  position: relative;
+  z-index: 2;
 }
 
-/* primary call-to-action above the hero title — bold orange stadium pill.
-   Desktop puts "Join Waitlist" in the nav (Figma), so this pill is mobile-only;
-   the wrapper + pill are re-shown in the ≤768px block. */
+.hero__media {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(8px, 2vw, 24px);
+  text-align: center;
+}
+.hero__media img {
+  display: inline-block;
+  width: auto;
+  max-width: min(74vw, 1062px);
+  max-height: 52vh;
+  object-fit: contain;
+  height: auto;
+  filter: drop-shadow(0 30px 60px rgba(61, 54, 50, 0.22));
+}
+
+/* mobile-only Join Waitlist pill — the desktop CTA lives in the nav, so this is
+   hidden on desktop and switched on in the ≤768px hero block below. */
 .hero__cta-wrap { display: none; }
 .hero__cta {
   display: none;
   align-items: center;
   justify-content: center;
-  background: #ff5733;
+  background: var(--orange);
   color: #fff;
   font-weight: 700;
   font-size: clamp(16px, 1.8vw, 21px);
@@ -284,24 +387,12 @@ textarea:focus-visible {
   text-decoration: none;
   padding: 16px 64px;
   border-radius: 999px;
-  box-shadow: 0 10px 26px rgba(255, 87, 51, 0.4);
+  box-shadow: 0 10px 26px rgba(224, 77, 27, 0.4);
   transition: transform var(--dur-fast) var(--ease-spring),
     box-shadow var(--dur-fast) var(--ease-out);
 }
-.hero__cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(255, 87, 51, 0.55);
-}
+.hero__cta:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(224, 77, 27, 0.55); }
 .hero__cta:active { transform: translateY(0) scale(0.98); }
-
-.hero__image {
-  width: auto;
-  max-width: 100%;
-  max-height: 55vh;
-  object-fit: contain;
-  margin: 0 auto;
-  filter: drop-shadow(0 30px 60px rgba(61, 54, 50, 0.25));
-}
 
 /* ===================== ABOUT ===================== */
 .about {
@@ -325,7 +416,7 @@ textarea:focus-visible {
 .about__title {
   font-family: "Cormorant Garamond", serif;
   font-weight: 700;
-  font-size: clamp(44px, 7vw, 75px);
+  font-size: var(--fs-display);
   margin: 0 0 clamp(28px, 5vw, 48px);
   color: #000;
   max-width: var(--maxw);
@@ -351,7 +442,7 @@ textarea:focus-visible {
 .about__media img {
   width: 100%;
   height: auto; /* scale height from the constrained width — without this the height="981" attr stretches the photo */
-  border-radius: 8px;
+  border-radius: var(--radius);
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
 }
 
@@ -384,7 +475,7 @@ textarea:focus-visible {
   z-index: 1;
   font-family: "Cormorant Garamond", serif;
   font-weight: 700;
-  font-size: clamp(40px, 6vw, 70px);
+  font-size: var(--fs-display);
   margin: 0 0 clamp(20px, 3vw, 32px);
   color: #000;
   max-width: var(--maxw);
@@ -511,10 +602,11 @@ textarea:focus-visible {
 .feature__panel-inner { overflow: hidden; }
 .feature__desc {
   font-family: "DM Sans", system-ui, sans-serif;
-  font-size: clamp(15px, 1.5vw, 19px);
-  line-height: 1.55;
+  font-size: var(--fs-body);
+  line-height: 1.66;
   color: #4a443f;
   max-width: 42ch;
+  padding-left: 16px;     /* clear the accent bar; align the start under the label */
   margin: 0 0 clamp(16px, 2vw, 22px);
   opacity: 0;
   transition: opacity var(--dur-mid) var(--ease-out);
@@ -553,28 +645,172 @@ textarea:focus-visible {
   align-items: center;
 }
 
+/* relative anchor so the theme slider can pin to the device's right edge without
+   disturbing the device's own centering (the wrap shrink-wraps the device). */
+.device-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+/* ----- vertical light/dark slider beside the device ----- */
+.theme-slider {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 18px;
+  width: 34px;
+  height: 86px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border: 1px solid rgba(61, 54, 50, 0.15);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(61, 54, 50, 0.12);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.theme-slider__icon {
+  position: relative;
+  z-index: 1;
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+.theme-slider__icon--sun { color: var(--orange); }     /* top, active in light */
+.theme-slider__icon--moon { color: #9a9089; }          /* bottom */
+/* sliding knob: sits over the sun (top) in light, slides over the moon in dark */
+.theme-slider__knob {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 2px 6px rgba(61, 54, 50, 0.28);
+  transition: top var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-out);
+}
+html[data-theme="dark"] .theme-slider__knob { top: calc(100% - 30px); }
+/* in dark the moon becomes the active (knob) end; sun dims */
+html[data-theme="dark"] .theme-slider__icon--sun { color: #9a9089; }
+html[data-theme="dark"] .theme-slider__icon--moon { color: #1a1612; }
+html[data-theme="dark"] .theme-slider {
+  background: #242018;
+  border-color: #3a3228;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+/* One-time attention nudge: JS adds .is-hinting when the slider first scrolls
+   into view; the knob emits a soft expanding ring twice, then the class is
+   removed. Pure box-shadow so it composes with the knob's positioning in both
+   orientations. Gated behind no-preference to respect reduced-motion users. */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-slider.is-hinting .theme-slider__knob {
+    animation: sliderHintPulse 1.1s var(--ease-out) 2;
+  }
+}
+@keyframes sliderHintPulse {
+  0%   { box-shadow: 0 2px 6px rgba(61, 54, 50, 0.28), 0 0 0 0 rgba(224, 77, 27, 0.5); }
+  70%  { box-shadow: 0 2px 6px rgba(61, 54, 50, 0.28), 0 0 0 11px rgba(224, 77, 27, 0); }
+  100% { box-shadow: 0 2px 6px rgba(61, 54, 50, 0.28), 0 0 0 0 rgba(224, 77, 27, 0); }
+}
+/* On mobile there's no room beside the phone (it fills its narrow grid column),
+   so the slider would be clipped by .discover's overflow:clip if pinned outside.
+   Instead, overlay it on the right side of the phone screen — inside the wrap (=
+   the phone's box), so it's always visible and never clipped. */
+@media (max-width: 768px) {
+  /* mobile: lift the toggle OUT of the phone and sit it above the device as a
+     horizontal pill (beneath the "upgraded" heading). order:-1 puts it before the
+     device (which comes first in the DOM); .device-wrap is a flex column below. */
+  .theme-slider {
+    position: relative;      /* in flow, but still the knob's positioning context */
+    order: -1;
+    left: auto;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin: 0 0 14px;
+    flex-direction: row;
+    width: 86px;
+    height: 34px;
+    padding: 0 8px;
+    z-index: 3;
+  }
+  /* knob slides left↔right (mirrors the vertical top↔bottom behaviour) */
+  .theme-slider__knob {
+    top: 50%;
+    left: 4px;
+    margin-left: 0;
+    transform: translateY(-50%);
+    transition: left var(--dur-fast) var(--ease-spring),
+      background var(--dur-fast) var(--ease-out);
+  }
+  html[data-theme="dark"] .theme-slider__knob { top: 50%; left: calc(100% - 30px); }
+}
+
 /* Static iPhone mockup — the bezel + tab bar never move; only the inner
    screenshot swaps (and the active tab highlights) when a tab is tapped. */
 .device {
   position: relative;
-  width: clamp(248px, 33vw, 358px);
+  /* Cap the device by available viewport height so the whole phone fits below
+     the 95px sticky nav. Device height ≈ 2.107× its width (738/1600 screen +
+     2.6% bezels), so 0.47 ≈ 1/2.107 converts a height budget into width.
+     min() keeps the original size on tall screens; the cap only bites when the
+     viewport is too short to show the full phone. */
+  width: min(clamp(248px, 33vw, 358px), calc((100vh - 150px) * 0.47));   /* fallback */
+  width: min(clamp(248px, 33vw, 358px), calc((100svh - 150px) * 0.47));  /* svh when supported */
   margin-inline: auto;
-  background: #111014;
+  /* Brushed dark-titanium housing: lighter at the diagonal edges to read as a
+     metal rail catching light, settling to near-black across the faces. */
+  background:
+    linear-gradient(155deg, #343437 0%, #1c1c1e 26%, #161617 52%, #1c1c1e 74%, #343437 100%),
+    #1a1a1a;
   border-radius: 14% / 6.6%;
-  padding: 2.6%;
+  /* thin, uniform bezels with a slightly thicker chin (top right bottom = sides) */
+  padding: 3.6% 3.6% 4.4%;
+  /* Apple-accurate housing: top + side specular rails, a crisp outer edge, then
+     a soft grounded shadow + a tighter contact shadow so the phone sits on the
+     page instead of floating. */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 30px 60px -20px rgba(61, 54, 50, 0.5);
+    inset 0 2px 1px -1px rgba(255, 255, 255, 0.28),
+    inset 2px 0 1px -1px rgba(255, 255, 255, 0.06),
+    inset -2px 0 1px -1px rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 26px 50px -22px rgba(61, 54, 50, 0.45),
+    0 10px 22px -12px rgba(61, 54, 50, 0.35);
 }
 .device__screen {
   position: relative;
   /* match the supplied screenshots (738×1600) exactly so object-fit:cover
      shows the full shot — including its baked-in status bar + tab bar — uncropped */
   aspect-ratio: 738 / 1600;
+  /* inner radius stays tighter than the frame (concentric bezel) */
   border-radius: 11.5% / 5.6%;
   overflow: hidden;
-  background: #111014;
+  background: #000;
+  /* hairline + soft edge vignette → glass depth under the bezel */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 12px rgba(0, 0, 0, 0.55);
 }
+/* ---- Side buttons: raised titanium rails peeking from the frame edge ---- */
+.device__btn {
+  position: absolute;
+  z-index: 2;
+  width: 3px;
+  background: linear-gradient(180deg, #2c2c2e, #161617);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.device__btn--volup { left: -2px;  top: 27%; height: 8%;  border-radius: 2px 0 0 2px; }
+.device__btn--voldn { left: -2px;  top: 37%; height: 8%;  border-radius: 2px 0 0 2px; }
+.device__btn--power { right: -2px; top: 23%; height: 11%; border-radius: 0 2px 2px 0; }
 .device__shots { position: absolute; inset: 0; }
 .device__shot {
   position: absolute;
@@ -597,12 +833,13 @@ textarea:focus-visible {
 .device__screen::after {
   content: "";
   position: absolute;
-  top: 2.4%;
+  top: 2.1%;
   left: 50%;
   transform: translateX(-50%);
-  width: 31%;
-  aspect-ratio: 3.4 / 1;   /* real Dynamic Island proportion */
-  background: #0b0b0d;
+  width: 30%;
+  aspect-ratio: 3.3 / 1;   /* real Dynamic Island proportion */
+  /* near-black pill with a faint camera-lens glint on the right */
+  background: #050506 radial-gradient(circle at 78% 50%, rgba(48, 54, 74, 0.9) 0 9%, transparent 10%);
   border-radius: 999px;
   z-index: 3;
   pointer-events: none;
@@ -630,7 +867,7 @@ textarea:focus-visible {
 .waitlist__title {
   font-family: "Cormorant Garamond", serif;
   font-weight: 700;
-  font-size: clamp(40px, 6vw, 75px);
+  font-size: var(--fs-display);
   margin: 0 0 16px;
   color: #fff;
 }
@@ -652,7 +889,7 @@ textarea:focus-visible {
   height: 72px;
   padding: 0 28px;
   border: 1px solid transparent;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: #d9cafe;
   font-family: inherit;
   font-size: 18px;
@@ -667,7 +904,7 @@ textarea:focus-visible {
   height: 72px;
   padding: 0 48px;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: #4c1d95;
   color: #fff;
   font-family: inherit;
@@ -690,6 +927,321 @@ textarea:focus-visible {
 }
 .waitlist__msg.is-ok { color: #fff; }
 .waitlist__msg.is-err { color: #fff; }
+
+/* "Invited by ATR-XXXXX" hint shown when arriving via a referral link */
+.waitlist__invited {
+  margin: 0 0 24px;
+  font-size: 15px;
+  color: #fff;
+}
+.waitlist__invited-code {
+  font-family: "Jost", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+
+/* ===================== REFERRAL DASHBOARD ===================== */
+/* Lives inside the orange waitlist block: lavender card, deep-purple
+   accents (matching the submit button) so it reads as part of the set. */
+.dash {
+  width: min(560px, 100% - 16px);
+  margin: 8px auto 0;
+  text-align: left;
+}
+/* CTA beneath the referral card → full queue page. Deep-purple to match the
+   block's submit/copy buttons; pill + lift to match the site's CTAs. */
+.waitlist__queue-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 28px auto 0;
+  padding: 14px 44px;
+  background: #4c1d95;
+  color: #fff;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  border-radius: 999px;
+  box-shadow: 0 10px 26px rgba(76, 29, 149, 0.35);
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-spring),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+.waitlist__queue-btn:hover {
+  background: #3d1679;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(76, 29, 149, 0.45);
+}
+.waitlist__queue-btn:active { transform: translateY(0) scale(0.98); }
+.dash__panel {
+  background: var(--lavender, #ece4fe);
+  border-radius: var(--radius);
+  padding: clamp(22px, 4vw, 32px);
+  box-shadow: 0 14px 36px rgba(61, 54, 50, 0.22);
+}
+.dash__stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.dash__stat { display: flex; flex-direction: column; gap: 4px; }
+.dash__stat--right { text-align: right; }
+.dash__label {
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #6b5fa0;
+}
+.dash__value {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+  font-size: clamp(34px, 6vw, 46px);
+  line-height: 1;
+  color: #4c1d95;
+}
+
+/* progress to milestone */
+.dash__progress { margin-top: 22px; }
+.dash__progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.dash__progress-count { font-family: "Jost", sans-serif; font-weight: 500; color: #4c1d95; }
+.dash__bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(76, 29, 149, 0.16);
+  overflow: hidden;
+}
+.dash__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #4c1d95;
+  transition: width var(--dur-mid) var(--ease-out);
+}
+
+/* share link + copy */
+.dash__share { margin-top: 24px; }
+.dash__link-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.dash__link {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(76, 29, 149, 0.2);
+  border-radius: var(--radius);
+  background: #fff;
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+}
+.dash__copy {
+  height: 46px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius);
+  background: #4c1d95;
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-spring);
+}
+.dash__copy:hover { background: #3d1679; transform: translateY(-1px); }
+.dash__copy:active { transform: translateY(0) scale(0.97); }
+.dash__copy.is-copied { background: #2f9e54; }
+.dash__code {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #6b5fa0;
+}
+.dash__code span { font-family: "Jost", sans-serif; font-weight: 500; letter-spacing: 0.04em; }
+
+/* two-sided reward summary (perks earned so far + referee welcome) */
+.dash__reward {
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border-radius: var(--radius, 14px);
+  background: rgba(224, 77, 27, 0.08);
+  border: 1px solid rgba(224, 77, 27, 0.2);
+  font-family: "Jost", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--orange);
+  text-align: left;
+}
+
+/* "Share to Story" — the primary visual-channel share action */
+.dash__story {
+  margin-top: 22px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 52px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #fff;
+  font-family: "Jost", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-spring);
+}
+.dash__story:hover { background: var(--orange-bright); transform: translateY(-1px); }
+.dash__story:active { transform: translateY(0) scale(0.98); }
+.dash__story:disabled { opacity: 0.7; cursor: default; transform: none; }
+.dash__story-icon { font-size: 16px; }
+.dash__story-hint {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #6b5fa0;
+  text-align: center;
+}
+
+/* share buttons */
+.dash__buttons {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.dash__btn {
+  border: 1px solid rgba(76, 29, 149, 0.25);
+  border-radius: 999px;
+  background: #fff;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4c1d95;
+  text-decoration: none;
+  transition: background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.dash__btn:hover { background: #f4f0ff; border-color: #4c1d95; }
+
+/* ===================== LEADERBOARD ===================== */
+.board {
+  width: min(560px, 100% - 16px);
+  margin: 28px auto 0;
+  text-align: left;
+}
+.board__head {
+  font-family: "Jost", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 12px;
+}
+.board__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 8px 22px rgba(61, 54, 50, 0.18);
+}
+.board__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 18px;
+  font-size: 15px;
+}
+.board__row + .board__row { border-top: 1px solid #f0ecfa; }
+.board__left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.board__rank {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--lavender, #ece4fe);
+  color: #4c1d95;
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+.board__email {
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.board__count {
+  flex: none;
+  background: #4c1d95;
+  color: #fff;
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+.board__empty {
+  padding: 22px 18px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b5fa0;
+}
+/* Signup-order queue: join date sits where the referral count does. */
+.board__date {
+  flex: none;
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  color: rgba(61, 54, 50, 0.6);
+  white-space: nowrap;
+}
+.board__more {
+  display: block;
+  margin: 16px auto 0;
+  padding: 10px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font-family: "Jost", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--dur-fast, 0.18s) var(--ease-out, ease),
+              color var(--dur-fast, 0.18s) var(--ease-out, ease);
+}
+.board__more:hover { background: #fff; color: var(--dark, #1e1d1b); }
+.board__more:disabled { opacity: 0.5; cursor: default; }
+
+@media (max-width: 768px) {
+  .dash__buttons .dash__btn { flex: 1 1 auto; text-align: center; }
+}
 
 /* ===================== FOOTER ===================== */
 .footer {
@@ -715,10 +1267,10 @@ textarea:focus-visible {
   letter-spacing: 2.5px;
   color: var(--lavender-soft);
 }
-.footer__col h4 {
+.footer__col h3 {
   font-family: "Jost", sans-serif;
   font-weight: 400;
-  font-size: 9px;
+  font-size: var(--fs-eyebrow);
   letter-spacing: 3px;
   text-transform: uppercase;
   margin: 0 0 24px;
@@ -787,22 +1339,9 @@ textarea:focus-visible {
   /* anchors land below the 64px sticky header */
   section { scroll-margin-top: 64px; }
 
-  /* ----- HERO: one full viewport — iPhone mockup (nav inside) on stripes ----- */
-  /* keep the scrolling tagline loop on mobile, just slimmer so it fits the hero */
-  /* center the running marquee vertically in the bar (it was bottom-jammed) and
-     give it a touch more height so the letters aren't compacted */
-  .ribbon { padding: 14px 0; display: flex; align-items: center; }
-  .ribbon__track { flex: none; }
-  .ribbon em { font-size: 13px; letter-spacing: 1.2px; font-weight: 500; line-height: 1; padding: 0 11px; }
-
-  /* at least one screen below the 64px sticky header, but allowed to GROW so that
-     on short devices (iPhone SE, iPhone 14 w/ address bar) the content is never
-     clipped — the CTA pill must stay fully visible, not hidden under the header.
-     No fixed height + no vertical clip; horizontal overflow is handled by
-     body{overflow-x:hidden}. */
   .hero {
     min-height: calc(100svh - 64px);
-    overflow: visible;
+    overflow: hidden;
   }
 
   /* soft pale peach/salmon candy stripes (same palette as desktop, slimmer) */
@@ -819,69 +1358,59 @@ textarea:focus-visible {
         rgba(255, 214, 184, 0.45) 0%, rgba(255, 214, 184, 0) 62%);
   }
 
+  /* Figma mobile hero: flush-right pill, then title, then a single phone screen.
+     Full-bleed inner (no side padding) so the pill can reach the right edge; the
+     title/phone keep their own breathing room. */
   .hero__inner {
+    flex: 1;
     justify-content: center;
-    /* don't shrink below the content (base sets min-height:0): on short screens
-       this lets the inner grow to fit so the centered content's top — the pill —
-       sits just below the ribbon instead of overflowing up under the header */
-    min-height: auto;
-    /* stretch (not center) so the CTA wrapper fills the full width and the pill
-       can reach the right edge; title/phone re-center themselves below */
     align-items: stretch;
-    gap: clamp(20px, 4.5vh, 38px);
-    /* full-bleed inner: the base `margin: 0 auto` shrink-wraps the inner to its
-       content width (auto cross-axis margins disable flex stretch), which would
-       stop the CTA pill from ever reaching the screen edge. Force full width with
-       no side padding so the pill can sit flush against the right edge. Title and
-       phone stay centered, so they don't need the side padding. */
+    gap: 0;
     width: 100%;
     max-width: none;
     margin-inline: 0;
-    padding-left: 0;
-    padding-right: 0;
-    padding-top: clamp(24px, 6vh, 48px);
-    padding-bottom: clamp(20px, 5vh, 40px);
+    padding: clamp(24px, 5vh, 40px) 0 clamp(24px, 4vh, 34px);
   }
-  /* title near the top, with the Figma drop shadow */
-  .hero__title {
-    font-size: clamp(22px, 7vw, 30px);
-    margin-bottom: 0;
-    text-shadow: 0 3px 3px rgba(0, 0, 0, 0.25);
-  }
-  /* Figma mobile: pill anchored to the right screen edge, rounded left end ~a
-     third in. The wrapper spans the full hero width (no side padding on the
-     inner), and the pill is a normal block inside it sized purely by percentages:
-     margin-left 32% + width 68% = 100%, so the right edge is always flush and the
-     left always lands at a third — identical proportions on every device width.
-     Padding/font use clamp so the pill scales up on larger screens. */
-  /* full-width flex wrapper; pill grows (flex:1) to fill from a 30% left inset to
-     the right edge — same proportions on every device width, always flush right */
+  /* pill above the title, anchored to the right edge with a rounded left end ~a
+     third in ("starts from the right, ends in between") */
   .hero__cta-wrap {
+    order: -1;
     display: flex;
     width: 100%;
     box-sizing: border-box;
-    padding-left: 25%;
+    padding-left: 38%;
+    margin: 0 0 clamp(14px, 4vw, 24px);
   }
   .hero__cta {
     display: flex;
     flex: 1;
-    padding: clamp(11px, 3.3vw, 20px) clamp(20px, 6vw, 48px);
-    font-size: clamp(15px, 4.4vw, 24px);
-    border-radius: 999px 0 0 999px;
+    padding: clamp(11px, 3.3vw, 18px) clamp(20px, 6vw, 40px);
+    font-size: clamp(15px, 4.4vw, 22px);
+    border-radius: 999px 0 0 999px;     /* left-rounded, flush right */
   }
-  /* the single hero <picture> serves the upright single-phone shot on mobile;
-     size + shadow it for the one-screen hero (was .hero__phone-mobile) */
-  .hero__image {
-    max-width: 80%;
+  .hero__title {
+    font-size: clamp(26px, 7.2vw, 38px);
+    padding-inline: 16px;
+    text-shadow: 0 3px 3px rgba(0, 0, 0, 0.25);
+  }
+  .hero__media {
+    margin-top: clamp(8px, 3vw, 18px);
+  }
+  .hero__media img {
+    aspect-ratio: auto;                 /* single portrait phone, natural ratio */
+    max-width: 78%;
     max-height: 60vh;
-    filter: drop-shadow(0 22px 38px rgba(61, 54, 50, 0.28));
   }
 
   /* ----- ABOUT: rack photo, then text in a rounded lavender card, no heading ----- */
   .about {
     padding-top: clamp(40px, 12vw, 64px);
   }
-  .about__title { display: none; }
+  .about__title {
+    font-size: clamp(30px, 8vw, 42px);
+    line-height: 1.12;
+    margin-bottom: clamp(20px, 5vw, 32px);
+  }
   .about__grid {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -912,12 +1441,12 @@ textarea:focus-visible {
   .about__media img {
     width: 88%;
     margin-inline: auto;
-    border-radius: 20px;
+    border-radius: var(--radius);
     box-shadow: 0 16px 34px rgba(61, 54, 50, 0.12);
   }
   .about__text {
     background: var(--lavender);
-    border-radius: 20px;
+    border-radius: var(--radius);
     padding: clamp(22px, 6vw, 34px);
     box-shadow: 0 16px 34px rgba(61, 54, 50, 0.12);
   }
@@ -936,10 +1465,10 @@ textarea:focus-visible {
   /* expanded description: calm, editorial rhythm within its column */
   .feature__desc {
     font-size: 15px;        /* more readable */
-    line-height: 1.6;       /* calmer */
+    line-height: 1.73;      /* calmer — +2px leading */
     margin-top: 10px;       /* gap below the title/icon row */
     margin-bottom: 22px;    /* gap above the divider/next tile */
-    padding-left: 14px;     /* clear the orange accent bar; align under the label */
+    padding-left: 24px;     /* clear the orange accent bar with breathing room */
     padding-right: 6px;     /* avoid right-edge crowding */
   }
   .discover__heading {
@@ -949,6 +1478,9 @@ textarea:focus-visible {
   /* centre the device within its 65% column, leaving room each side for the
      soft drop shadow to render without being cut by .discover's overflow:clip */
   .discover__phone { justify-self: stretch; align-items: center; min-width: 0; }
+  /* full-width flex column: the theme pill (order:-1) sits above the centered
+     device, and the device keeps its own capped width + margin-inline:auto. */
+  .device-wrap { display: flex; flex-direction: column; align-items: center; width: 100%; }
   /* Apple-style device frame (mobile only — desktop base rules untouched):
      contained width, pronounced bezel, real-iPhone corners, defined edge, and a
      soft, mostly-vertical drop shadow whose horizontal spread stays within the
@@ -957,21 +1489,28 @@ textarea:focus-visible {
     width: 100%;
     max-width: 200px;
     margin-inline: auto;
-    padding: 9px;
+    padding: 8px 8px 10px;
     border-radius: 38px;
-    background: #0d0c10;
+    background:
+      linear-gradient(155deg, #343437 0%, #1c1c1e 26%, #161617 52%, #1c1c1e 74%, #343437 100%),
+      #1a1a1a;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      0 0 0 1px rgba(20, 18, 24, 0.55),
+      inset 0 2px 1px -1px rgba(255, 255, 255, 0.24),
+      inset 2px 0 1px -1px rgba(255, 255, 255, 0.06),
+      inset -2px 0 1px -1px rgba(255, 255, 255, 0.06),
+      0 0 0 1px rgba(0, 0, 0, 0.6),
       0 16px 34px -16px rgba(61, 54, 50, 0.4),
       0 5px 12px -6px rgba(61, 54, 50, 0.28);
   }
-  /* screen radius = frame radius − bezel; hairline edge so the screen reads as
-     housed even over the dark app screenshots */
+  /* screen radius = frame radius − bezel; hairline + edge vignette for glass depth */
   .device__screen {
     border-radius: 30px;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      inset 0 0 10px rgba(0, 0, 0, 0.55);
   }
+  /* slimmer side rails on the smaller mobile device */
+  .device__btn { width: 2px; }
 
   /* ----- WAITLIST: stack the form (colors now come from the base rules) ----- */
   .waitlist__form { flex-direction: column; }
@@ -989,13 +1528,15 @@ textarea:focus-visible {
   }
 }
 
-/* short phones (e.g. iPhone SE, ~667px tall): trim the hero phone so the slim
-   tiles + open description still fit comfortably alongside it. */
+/* short phones: keep the hero artwork readable without forcing a horizontal crop. */
 @media (max-width: 768px) and (max-height: 720px) {
-  .device { max-width: 180px; }
-  .feature__head { padding: 10px 2px 10px 14px; }
-  .feature__label { font-size: clamp(20px, 5.5vw, 28px); }
-  .feature__desc { font-size: 14px; }
+  .hero__media {
+    margin-top: clamp(8px, 3vw, 16px);
+  }
+  .hero__media img {
+    max-width: 70%;
+    max-height: 48vh;
+  }
 }
 
 @media (max-width: 420px) {
@@ -1004,7 +1545,6 @@ textarea:focus-visible {
 
 /* respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .ribbon__track { animation: none; }
   html { scroll-behavior: auto; }
   /* reveals are never hidden (JS doesn't add `js-reveal` under reduced motion),
      but neutralise the remaining state transitions so nothing eases */
@@ -1026,7 +1566,7 @@ textarea:focus-visible {
 .legal__eyebrow {
   font-family: "Jost", sans-serif;
   font-weight: 400;
-  font-size: 11px;
+  font-size: var(--fs-eyebrow);
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--coral-bright);
@@ -1035,7 +1575,7 @@ textarea:focus-visible {
 .legal__title {
   font-family: "Cormorant Garamond", serif;
   font-weight: 700;
-  font-size: clamp(40px, 6vw, 70px);
+  font-size: var(--fs-display);
   line-height: 1.05;
   margin: 0 0 18px;
   color: #000;
@@ -1056,7 +1596,7 @@ textarea:focus-visible {
 .legal__body h2 {
   font-family: "Cormorant Garamond", serif;
   font-weight: 700;
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: var(--fs-h2);
   line-height: 1.2;
   color: var(--dark);
   margin: clamp(34px, 5vw, 52px) 0 14px;
@@ -1098,7 +1638,7 @@ textarea:focus-visible {
 }
 .faq__item {
   border: 1px solid rgba(61, 54, 50, 0.12);
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: #fff;
   margin-bottom: 14px;
   overflow: hidden;
@@ -1121,7 +1661,7 @@ textarea:focus-visible {
   text-align: left;
   font-family: "Cormorant Garamond", serif;
   font-weight: 600;
-  font-size: clamp(19px, 2vw, 24px);
+  font-size: var(--fs-h3);
   color: var(--dark);
 }
 .faq__icon {
@@ -1175,7 +1715,7 @@ textarea:focus-visible {
   width: 100%;
   padding: 16px 18px;
   border: 1px solid rgba(61, 54, 50, 0.18);
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: #fff;
   font-family: "DM Sans", system-ui, sans-serif;
   font-size: 16px;
@@ -1193,7 +1733,7 @@ textarea:focus-visible {
   padding: 0 48px;
   height: 60px;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: var(--orange);
   color: #fff;
   font-family: "DM Sans", system-ui, sans-serif;
@@ -1216,13 +1756,13 @@ textarea:focus-visible {
 .contact__aside {
   background: var(--lavender-soft);
   border: 1px solid rgba(61, 54, 50, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius);
   padding: clamp(24px, 3vw, 36px);
 }
 .contact__aside h2 {
   font-family: "Cormorant Garamond", serif;
   font-weight: 700;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: var(--fs-h2);
   margin: 0 0 12px;
   color: var(--dark);
 }
@@ -1255,4 +1795,140 @@ textarea:focus-visible {
 
 @media (max-width: 768px) {
   .contact { grid-template-columns: 1fr; }
+}
+
+/* ===================================================================
+   DARK MODE  —  scoped to html[data-theme="dark"] (set by theme-init.js /
+   the navbar toggle). Light mode is the default and is never touched.
+   A refined warm-dark palette: dark brown surfaces, cream text, a slightly
+   desaturated terracotta accent.
+   =================================================================== */
+html[data-theme="dark"] {
+  /* Most custom props can flip directly. `--ink` is overloaded (it is also the
+     ribbon / +- icon-bar surface) so we flip it to the cream TEXT colour here and
+     re-pin its two surface uses below. `--lavender`/`--lavender-soft` stay light:
+     they double as light card surfaces + light footer text, re-pinned per-use. */
+  --cream: #1a1612;          /* page background */
+  --ink: #f0ebe3;            /* primary text */
+  --dark: #14110d;           /* footer (a touch deeper than the page) */
+  --orange: #c4603a;         /* CTA / accent — desaturated terracotta */
+  --orange-bright: #d06d44;
+  --coral-bright: #e0916b;   /* active feature label / heading accent */
+  color-scheme: dark;
+}
+
+/* ----- nav ----- */
+html[data-theme="dark"] .nav {
+  background: rgba(26, 22, 18, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #3a3228;
+}
+html[data-theme="dark"] .nav.is-scrolled {
+  background: rgba(26, 22, 18, 0.9);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+html[data-theme="dark"] .nav__logo,
+html[data-theme="dark"] .nav__links a { color: #f0ebe3; }
+html[data-theme="dark"] .theme-toggle {
+  color: #f0ebe3;
+  background: #242018;
+  border-color: #3a3228;
+}
+html[data-theme="dark"] .theme-toggle:hover { background: #2c271f; }
+
+/* ----- hero ----- */
+html[data-theme="dark"] .hero__stripes {
+  background:
+    repeating-linear-gradient(90deg,
+      #201a15 0, #201a15 85px,
+      #2a2019 85px, #2a2019 170px);
+}
+html[data-theme="dark"] .hero__stripes::after {
+  background:
+    radial-gradient(60% 55% at 32% 42%,
+      rgba(196, 96, 58, 0.18) 0%, rgba(196, 96, 58, 0) 60%);
+}
+html[data-theme="dark"] .ribbon { background: #242018; }
+html[data-theme="dark"] .hero__cta { background: var(--orange); }   /* mobile pill */
+/* the hero title is hardcoded #000 for the light hero — flip it to cream so it
+   stays readable on the dark-brown hero (matches the other dark-mode headings) */
+html[data-theme="dark"] .hero__title { color: #f0ebe3; }
+
+/* ----- about ----- */
+html[data-theme="dark"] .about__title,
+html[data-theme="dark"] .discover__heading { color: #f0ebe3; }
+html[data-theme="dark"] .about__text { color: #d9d2c7; }
+
+/* ----- discover / features ----- */
+html[data-theme="dark"] .discover {
+  background: linear-gradient(165deg, #201b15 0%, #241d18 55%, #2a201a 100%);
+}
+html[data-theme="dark"] .discover__blob { opacity: 0.12; }
+html[data-theme="dark"] .feature,
+html[data-theme="dark"] .feature:last-of-type { border-color: #3a3228; }
+html[data-theme="dark"] .feature__desc { color: #d9d2c7; }
+html[data-theme="dark"] .feature__icon { border-color: rgba(240, 235, 227, 0.28); }
+/* the +/- icon bars use var(--ink); keep them visible (light) on the dark page */
+html[data-theme="dark"] .acc-chevron { background: #242018; color: #f0ebe3; }
+
+/* ----- waitlist block ----- */
+html[data-theme="dark"] .waitlist { background: #a8482a; }   /* deepened terracotta */
+html[data-theme="dark"] .waitlist__input {
+  background: #2a251d;
+  color: #f0ebe3;
+  border-color: #3a3228;
+}
+/* dash / board cards stay light surfaces (elevated cards); their var(--ink)
+   text would otherwise flip to cream and vanish — re-pin it dark. */
+html[data-theme="dark"] .dash__progress-head,
+html[data-theme="dark"] .dash__link,
+html[data-theme="dark"] .board__email { color: #3d3632; }
+
+/* ----- legal / faq / contact pages (now shown in dark by default) ----- */
+/* Hero gradient is a light lavender→pink in light mode; make it a warm-dark
+   surface. Titles/headings/strong use #000 or var(--dark) (→ near-black in
+   dark) so re-pin them to cream; intro gray is lightened for contrast. */
+html[data-theme="dark"] .legal__hero {
+  background: linear-gradient(165deg, #201b15 0%, #241d18 55%, #2a201a 100%);
+}
+html[data-theme="dark"] .legal__title,
+html[data-theme="dark"] .legal__body h2,
+html[data-theme="dark"] .legal__body strong { color: #f0ebe3; }
+html[data-theme="dark"] .legal__intro { color: #d9d2c7; }
+
+/* FAQ accordion: white cards → dark surfaces, readable question text. */
+html[data-theme="dark"] .faq__item {
+  background: #242018;
+  border-color: #3a3228;
+}
+html[data-theme="dark"] .faq__item:hover {
+  border-color: rgba(224, 145, 107, 0.5);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="dark"] .faq__q { color: #f0ebe3; }
+
+/* Contact: white inputs would show cream text on white → dark surfaces; the
+   lavender aside becomes a dark card; muted notes lightened for contrast. */
+html[data-theme="dark"] .contact__field input,
+html[data-theme="dark"] .contact__field textarea {
+  background: #2a251d;
+  color: #f0ebe3;
+  border-color: #3a3228;
+}
+html[data-theme="dark"] .contact__aside {
+  background: #242018;
+  border-color: #3a3228;
+}
+html[data-theme="dark"] .contact__aside h2 { color: #f0ebe3; }
+html[data-theme="dark"] .contact__note,
+html[data-theme="dark"] .contact__aside-note { color: #b8b0a6; }
+
+/* the about paragraph is a lavender card on mobile — make it a dark surface so
+   the cream text stays readable (desktop has no card background). */
+@media (max-width: 768px) {
+  html[data-theme="dark"] .about__text {
+    background: #242018;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.4);
+  }
 }

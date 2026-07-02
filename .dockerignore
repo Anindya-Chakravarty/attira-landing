@@ -18,9 +18,19 @@ export-emails.js
 skills-lock.json
 
 # stray pasted screenshots/exports in the project root — never ship.
-# (assets/*.png is re-included so the real image assets still build.)
+# (assets/*.png|*.jpeg are re-included so the real image assets still build.)
 *.png
 !assets/*.png
+*.jpeg
+!assets/*.jpeg
 
 # scratch/temp files — never ship
 __*
+
+# internal docs, configs, and tooling — never ship to the public static root
+*.xlsx
+*.docx
+*.heic
+.mcp.json
+.venv-growth
+untitled folder

@@ -3,3 +3,15 @@ data/
 *.log
 .DS_Store
 .env
+
+# internal / generated business artifacts — keep out of the repo
+*.xlsx
+*.docx
+*.heic
+
+# stray pasted screenshots
+Screenshot*.png
+
+# local agent tooling / config
+.claude/
+.mcp.json

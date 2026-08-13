@@ -11,6 +11,7 @@
   <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
 
   <!-- PostHog (client) — pageviews + automatic UTM capture for traffic-source tracking.
        Self-hosted (not inline) so it passes the strict script-src 'self' CSP. -->
@@ -35,11 +36,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
   <!-- Apply the saved light/dark theme before first paint (external, CSP-safe). -->
   <script src="theme-init.js?v=2"></script>
-  <link rel="stylesheet" href="styles.css?v=63" />
+  <link rel="stylesheet" href="styles.css?v=71" />
 
   <!-- preload the composed hero image used in the Figma frame -->
   <link rel="preload" as="image" href="assets/hero-phones.webp?v=3" fetchpriority="high" />
 
+  <!-- TODO(store-links): "installUrl" is deliberately absent — iOS is still a
+       TestFlight beta invite, not a public App Store listing, and a TestFlight URL
+       in structured data misrepresents the app as generally available. Add it once
+       the App Store listing is live. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -80,6 +85,7 @@
         "applicationCategory": "LifestyleApplication",
         "operatingSystem": "iOS, Android",
         "url": "https://attira.org/",
+        "downloadUrl": "https://play.google.com/store/apps/details?id=com.tricore.attira",
         "description": "Attira turns your wardrobe into a catalogue of possibilities — rediscover outfits from pieces you already own with an AI personal stylist.",
         "screenshot": "https://attira.org/assets/og-image.png",
         "featureList": [
@@ -146,6 +152,35 @@
       </div>
       <div class="hero__cta-wrap" data-reveal="up" style="--reveal-delay:240ms">
         <a href="#waitlist" class="hero__cta">Get Access Now</a>
+      </div>
+      <!-- Store links. Android points at the live Play listing; iOS is a TestFlight
+           beta invite, not a public App Store listing yet — hence the note below.
+           Swap the iOS href and update the note at App Store launch (also in the
+           footer of all 9 pages). Grep: data-todo="store-url" -->
+      <!-- no data-reveal here on purpose: the reveal observer uses a -12% bottom
+           rootMargin, so a row this low in the hero would stay at opacity 0 until
+           the visitor scrolls. The badges must be visible on arrival. -->
+      <div class="store-badges store-badges--hero">
+        <div class="store-badges__item">
+          <a class="store-badge" data-todo="store-url"
+             href="https://testflight.apple.com/join/1yCPEdjU"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Join the Attira iOS beta on TestFlight">
+            <img src="assets/badge-app-store.svg?v=1" width="168" height="60" alt="Download on the App Store" />
+          </a>
+          <!-- no .store-badge__tag here: the note below the row already discloses
+               "iOS in beta", and both would stack into the same sentence twice.
+               The footer carries the tag instead, since it has no note. -->
+        </div>
+        <div class="store-badges__item">
+          <a class="store-badge" data-todo="store-url"
+             href="https://play.google.com/store/apps/details?id=com.tricore.attira"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Get Attira on Google Play">
+            <img src="assets/badge-google-play.svg?v=1" width="168" height="60" alt="Get it on Google Play" />
+          </a>
+        </div>
+        <p class="store-badges__note">Android out now · iOS in beta</p>
       </div>
     </div>
   </section>
@@ -364,6 +399,7 @@
       <div class="footer__col" data-reveal="up" style="--reveal-delay:80ms">
         <h3>Company</h3>
         <a href="#about">About Us</a>
+        <a href="/careers.html">Careers</a>
         <a href="/contact.html">Contact</a>
       </div>
       <div class="footer__col" data-reveal="up" style="--reveal-delay:140ms">
@@ -376,6 +412,31 @@
         <a href="/privacy.html">Privacy Policy</a>
         <a href="/terms.html">Terms &amp; Conditions</a>
       </div>
+    </div>
+    <!-- Store links. iOS is a TestFlight beta invite, not a public App Store
+         listing yet. Grep: data-todo="store-url" -->
+    <div class="footer__apps">
+      <span class="footer__apps-label">Get the app</span>
+      <div class="store-badges store-badges--footer store-badges--on-dark">
+        <div class="store-badges__item">
+          <a class="store-badge" data-todo="store-url"
+             href="https://testflight.apple.com/join/1yCPEdjU"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Join the Attira iOS beta on TestFlight">
+            <img src="/assets/badge-app-store.svg?v=1" width="168" height="60" alt="Download on the App Store" />
+          </a>
+          <span class="store-badge__tag">iOS beta · TestFlight</span>
+        </div>
+        <div class="store-badges__item">
+          <a class="store-badge" data-todo="store-url"
+             href="https://play.google.com/store/apps/details?id=com.tricore.attira"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Get Attira on Google Play">
+            <img src="/assets/badge-google-play.svg?v=1" width="168" height="60" alt="Get it on Google Play" />
+          </a>
+        </div>
+      </div>
+      <p class="footer__apps-legal">Apple and the Apple logo are trademarks of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC.</p>
     </div>
     <div class="footer__bottom">
       <span>© 2026 Attira. All rights reserved.</span>

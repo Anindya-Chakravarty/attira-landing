@@ -10,6 +10,7 @@
   <meta name="theme-color" content="#fffce8" />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
 
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website" />
@@ -29,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
   <script src="theme-init.js?v=2"></script>
-  <link rel="stylesheet" href="styles.css?v=63" />
+  <link rel="stylesheet" href="styles.css?v=71" />
 
   <script type="application/ld+json">
   {
@@ -80,6 +81,9 @@
         <p class="legal__intro">
           This Privacy Policy sets forth Tricore Technologies Private Limited's commitment to respecting your online privacy and recognises your need for appropriate protection and management of any Personal Data you share with us.
         </p>
+        <p class="legal__intro" style="font-size:0.95rem;opacity:0.8;">
+          <strong>Effective date:</strong> 13 August 2026 &nbsp;·&nbsp; <strong>Last updated:</strong> 13 August 2026
+        </p>
       </div>
     </section>
 
@@ -122,13 +126,17 @@
         <li>User-added descriptions or labels.</li>
       </ul>
 
-      <p><strong>3.3 Body Images (Virtual Try-On):</strong> Users may upload photographs of themselves to enable the virtual try-on functionality. These photographs may contain visual information about a user's body shape or physical appearance, including:</p>
+      <p><strong>3.3 Body Images and Derived Style Profile:</strong> Users may upload photographs of themselves to enable the virtual try-on and personalised styling functionality. These photographs contain visual information about a user's body shape and physical appearance. From them we collect and derive:</p>
       <ul>
-        <li>Body structure or silhouette data (used solely to position garments for visual simulation); and</li>
+        <li>Body structure or silhouette data (used to position garments for visual simulation);</li>
+        <li>An estimated style profile, comprising body shape estimate, shoulder-to-hip balance, torso-to-leg ratio, waist definition, skin undertone estimate, contrast level, recommended and less-flattering colours, and fit guidance for tops and bottoms; and</li>
         <li>Outfit preview images generated through virtual simulation.</li>
       </ul>
+      <p>We deliberately do <strong>not</strong> collect or infer age, ethnicity, weight, or gender identity from your photographs. The analysis that produces this profile is optional and is described in Section 7.5.</p>
 
-      <p><strong>3.4 Interaction and Preference Data:</strong> User interactions with the Platform may be recorded, including:</p>
+      <p><strong>3.4 AI Stylist Conversations:</strong> When you use the in-app AI stylist ("AIRA"), we collect the messages you send and the replies generated for you, together with the profile and wardrobe context used to personalise those replies (your first name, gender if provided, style preferences, favourite colours, and a summary of how many wardrobe items you own in each category).</p>
+
+      <p><strong>3.5 Interaction and Preference Data:</strong> User interactions with the Platform may be recorded, including:</p>
       <ul>
         <li>Outfit selections;</li>
         <li>Recommendation feedback;</li>
@@ -138,7 +146,7 @@
         <li>Navigation behaviour within the application.</li>
       </ul>
 
-      <p><strong>3.5 Contextual Data:</strong> Optional contextual inputs that may improve recommendations, including:</p>
+      <p><strong>3.6 Contextual Data:</strong> Optional contextual inputs that may improve recommendations, including:</p>
       <ul>
         <li>Occasion or event type;</li>
         <li>Weather data (derived from location region);</li>
@@ -146,7 +154,7 @@
         <li>Time-based usage patterns.</li>
       </ul>
 
-      <p><strong>3.6 Device and Usage Analytics:</strong> Standard application and website analytics (provided by PostHog, hosted in the United States) may collect information such as:</p>
+      <p><strong>3.7 Device and Usage Analytics:</strong> Standard application and website analytics (provided by PostHog, hosted in the United States) may collect information such as:</p>
       <ul>
         <li>Device type;</li>
         <li>Operating system;</li>
@@ -156,7 +164,17 @@
         <li>Session replays of website interactions, with form inputs masked by default.</li>
       </ul>
 
-      <p>3.7 We may also collect other forms of Personal Data that you provide to us voluntarily, or Personal Data that is mentioned in the consent notice presented to you at the point of collection.</p>
+      <p><strong>3.8 Recruitment Data:</strong> If you apply for a role through our careers page, we collect the information you submit in the application form, including:</p>
+      <ul>
+        <li>Name, email address, phone number, and current location;</li>
+        <li>Links you provide to your portfolio, work artefacts, and resume;</li>
+        <li>Professional background, including years of experience, work you have shipped, and the tools you use;</li>
+        <li>Your written answers to the role-specific questions; and</li>
+        <li>Current and expected compensation.</li>
+      </ul>
+      <p>Recruitment Data is used solely to assess your application, is not used for marketing, and is not combined with any Platform account you may hold. It is retained for the duration of the hiring process and for a reasonable period afterwards in case a further opportunity arises. You may ask us to delete it at any time by writing to the address in Section 16.</p>
+
+      <p>3.9 We may also collect other forms of Personal Data that you provide to us voluntarily, or Personal Data that is mentioned in the consent notice presented to you at the point of collection.</p>
 
       <h2>4. How and When We <em>Collect</em> Your Personal Data</h2>
       <p>We collect the afore-mentioned Personal Data through various channels including when you:</p>
@@ -165,10 +183,12 @@
         <li>Upload clothing items or photographs to create your digital wardrobe;</li>
         <li>Upload photographs of yourself to use the virtual try-on feature;</li>
         <li>Request or interact with AI-generated outfit recommendations;</li>
+        <li>Send messages to the in-app AI stylist ("AIRA");</li>
         <li>Use the purchase decision support feature to evaluate potential clothing purchases;</li>
         <li>Provide ratings, feedback, or preference signals in response to outfit recommendations;</li>
         <li>Modify or update your personal style profile or wardrobe;</li>
         <li>Contact us through customer service channels (email, chat, or contact forms);</li>
+        <li>Apply for a role through our careers page;</li>
         <li>Visit or use the Platform, through cookies and similar technologies; and</li>
         <li>Engage with any promotional activities, surveys, or campaigns.</li>
       </ul>
@@ -184,7 +204,9 @@
         <li>To analyse potential clothing purchases against your existing wardrobe and provide compatibility analysis, outfit potential assessments, redundancy signals, and styling suggestions;</li>
         <li>For responding to queries or requests submitted via our contact forms, customer service channels, or chat services;</li>
         <li>To improve the Platform's functionality, AI model performance, and user experience through analytics and aggregated or anonymised usage data;</li>
-        <li>For communication and transactions with third-party service providers, infrastructure providers, AI model providers, and business collaborators engaged in operating the Platform;</li>
+        <li>To operate the in-app AI stylist ("AIRA"), by sending your messages and the profile and wardrobe context described in Section 3.4 to our AI provider so that a personalised reply can be generated;</li>
+        <li>To transmit your photographs, wardrobe images, and AI stylist messages to the third-party AI providers identified in Section 7, strictly for the purpose of returning the result you requested;</li>
+        <li>For communication and transactions with third-party service providers, infrastructure providers, and business collaborators engaged in operating the Platform;</li>
         <li>For compliance with legal, regulatory, statutory, and contractual obligations;</li>
         <li>For security, fraud prevention, and safety purposes; and</li>
         <li>For any other purpose specifically disclosed to you at the time of collection or as consented to by you.</li>
@@ -194,14 +216,46 @@
       <p>We will retain your Personal Data, together with associated traffic data and logs of Processing activities, for a minimum period of 1 (one) year from the date of such Processing, or longer as necessary to fulfil the stated purposes or as required under Applicable Law. Once this period ends, we will securely delete your Personal Data. At least 48 (forty-eight) hours before erasure, we will notify you so that you may choose to log in to your account or contact us if you wish to retain your data.</p>
       <p>Users may delete individual wardrobe items, body images used for virtual try-on, and other data at any time through the Platform. Account deletion may trigger the deletion or anonymisation of associated Personal Data, subject to operational and legal requirements.</p>
 
-      <h2>7. <em>Disclosure</em> of Personal Data</h2>
-      <p>We may disclose your Personal Data with certain Data Processors who help us Process your Personal Data to fulfil the purpose for which it was collected. These may include third-party service providers including Google LLC (via Gemini API) engaged for cloud hosting and storage, AI model inference, image processing infrastructure, and authentication services, and PostHog Inc. (US region) for product and website analytics including session replay. We may also share Personal Data with regulatory authorities, law enforcement agencies, or other third parties as required by Applicable Law. Where the Application is distributed through the Apple App Store or Google Play Store, certain device analytics, crash reports, and diagnostic data may be shared with Apple Inc. or Google LLC (as applicable) for the purposes of application performance monitoring and debugging. Such sharing is governed by the privacy policies and terms of the respective App Distributor. Where third-party processors are used, they may process data on behalf of Tricore Technologies Private Limited in accordance with contractual obligations and applicable privacy requirements.</p>
+      <h2>7. <em>Disclosure</em> of Personal Data and Third-Party <em>AI Services</em></h2>
+
+      <p><strong>7.1 Overview.</strong> Attira's core features are powered by artificial intelligence. Some of that AI processing is performed by third-party AI providers acting as our Data Processors, which means certain Personal Data you provide — including photographs of yourself, images of your clothing, and the messages you send to our AI stylist — is transmitted to those providers so they can return a result to you. This section sets out exactly what data is sent, who it is sent to, and why. Data is sent only when you choose to use the feature that requires it, the Application tells you before your photographs are analysed, and you can decline or withdraw your permission at any time as described in Section 7.5.</p>
+
+      <p><strong>7.2 Third-party AI providers we send your data to.</strong> We use the following third-party AI providers. We do not send your Personal Data to any other AI provider.</p>
+
+      <p><strong>(a) Google LLC</strong> — through the Gemini API and Google Cloud Vertex AI, operated from data centres in the United States and other Google Cloud regions.</p>
+      <ul>
+        <li><strong>Data sent:</strong> photographs of yourself that you upload for virtual try-on or for style-profile analysis; images of clothing items in your wardrobe; descriptions of items that you type; and, when you use the AI stylist ("AIRA"), the text of your messages together with your first name, gender (if provided), your stated style preferences and favourite colours, and a summary of your wardrobe (the number of items you own in each category).</li>
+        <li><strong>Purpose:</strong> to generate virtual try-on preview images; to analyse your photographs and derive the style profile described in Section 3.3 (body shape estimate, skin undertone, contrast level, recommended colours, and fit guidance); to detect and classify the garments in an uploaded image; and to generate the AI stylist's replies and outfit recommendations.</li>
+        <li><strong>Not sent:</strong> your email address, your authentication credentials, your payment information, or your precise location.</li>
+      </ul>
+
+      <p><strong>(b) Features and Labels, Inc. (operating as "fal.ai")</strong> — a machine-learning inference provider based in the United States, which runs the image-segmentation model we use.</p>
+      <ul>
+        <li><strong>Data sent:</strong> photographs of yourself that you upload during onboarding, and images of clothing items — either as the image file itself, or as a temporary link from which fal.ai retrieves the image.</li>
+        <li><strong>Purpose:</strong> solely to identify the individual garments visible in an image and separate them from the background, so that those garments can be added to your digital wardrobe as distinct items.</li>
+        <li><strong>Not sent:</strong> your name, email address, account identifier, authentication credentials, payment information, or your location. Images are transmitted without any accompanying account information that would identify you to fal.ai.</li>
+      </ul>
+
+      <p><strong>7.3 How your data is treated by these AI providers.</strong> Google LLC and fal.ai process this data only as our Data Processors, on our documented instructions, and only for the purpose of returning the result you requested. We have contractual arrangements in place with each of them that require them to provide a standard of protection for your Personal Data that is the same as, or equal to, the standard set out in this Privacy Policy and required under Applicable Law. Your photographs, wardrobe images, and AI stylist conversations are <strong>not</strong> used by these providers to train, fine-tune, or improve their own AI models, and we do not sell your Personal Data or share it for advertising purposes. Where these providers retain inputs transiently for abuse-monitoring or operational reasons, that retention is limited and governed by our agreements with them.</p>
+
+      <p><strong>7.4 Other Data Processors.</strong> We also disclose Personal Data to the following recipients, who are not AI providers:</p>
+      <ul>
+        <li><strong>Google LLC (Firebase Authentication and Google Cloud Platform):</strong> account authentication, cloud hosting, databases, and secure storage of your images and generated previews;</li>
+        <li><strong>PostHog Inc. (United States):</strong> product and website analytics, including session replay of website interactions with form inputs masked by default;</li>
+        <li><strong>Functional Software, Inc. (Sentry):</strong> crash reporting and application diagnostics;</li>
+        <li><strong>Apple Inc. and Google LLC as app distributors:</strong> where the Application is distributed through the Apple App Store or Google Play Store, certain device analytics, crash reports, and diagnostic data may be shared with the relevant distributor for application performance monitoring and debugging. Such sharing is governed by the privacy policy and terms of that distributor; and</li>
+        <li><strong>Regulators, courts, and law-enforcement agencies</strong> where disclosure is required by Applicable Law.</li>
+      </ul>
+      <p>Each of these processors is engaged under contractual obligations requiring protection of your Personal Data equal to that described in this Privacy Policy. A current list of our processors is available on request from the Grievance Officer named in Section 16.</p>
+
+      <p><strong>7.5 Your control over AI processing.</strong> Before your photographs are analysed to build your style profile, the Application shows you what will be analysed and asks for your permission; you can decline, and you can turn this off at any time in <strong>Style Profile</strong> within the Application, which also erases the stored profile derived from your photographs. Virtual try-on and the AI stylist run only when you choose to use them, and you may stop using either feature at any time. You may delete your photographs, individual wardrobe items, and try-on results from within the Application, and you may delete your account entirely, which triggers deletion of the associated stored images. Withdrawing consent does not affect processing already carried out before withdrawal.</p>
 
       <h2>8. Cross-Border <em>Transfers</em> of Personal Data</h2>
-      <p>We may, in the future, transfer Personal Data outside India for Processing, to jurisdictions where such transfer is not restricted under Applicable Law. We will ensure that appropriate safeguards are in place to protect your Personal Data in accordance with Applicable Law.</p>
+      <p>We are based in India, and the Data Processors described in Section 7 — including Google LLC and Features and Labels, Inc. (fal.ai) — operate from the United States and other jurisdictions outside India. Accordingly, your Personal Data, <strong>including the photographs and wardrobe images you upload and the messages you send to the AI stylist</strong>, is transferred outside India for Processing. We make such transfers only to jurisdictions where the transfer is not restricted under Applicable Law, and we ensure appropriate contractual safeguards are in place requiring the recipient to protect your Personal Data to a standard equal to that described in this Privacy Policy.</p>
 
       <h2>9. Sensitive Data and <em>Biometric</em> Considerations</h2>
-      <p>The Platform processes user-uploaded photographs for virtual try-on purposes. These photographs may contain visual information about a user's physical appearance, including body shape. Photographs are used solely for visual outfit simulation within the Platform. The Platform does not perform facial recognition or identity verification.</p>
+      <p>The Platform processes user-uploaded photographs for virtual try-on and style-profile purposes. These photographs contain visual information about your physical appearance, including body shape and skin tone, and are analysed to derive the style-profile attributes described in Section 3.3. Photographs and the attributes derived from them are used solely to generate outfit simulations and styling recommendations within the Platform.</p>
+      <p>As set out in Section 7, these photographs are transmitted to Google LLC and to Features and Labels, Inc. (fal.ai) for that processing. We ask for your permission in the Application before analysing your photographs, and you may withdraw it at any time in <strong>Style Profile</strong>. The Platform does <strong>not</strong> perform facial recognition or identity verification, does not use your photographs to identify you, and does not sell, lease, or trade your photographs or any data derived from them.</p>
 
       <h2>10. Children's <em>Data</em></h2>
       <p>We do not knowingly collect or Process Personal Data of children (i.e. individuals under the age of 18 (eighteen) years) without verifiable parental consent. If we become aware that we have collected Personal Data from a child without valid consent, we will delete such information promptly.</p>
@@ -262,6 +316,7 @@
       <div class="footer__col">
         <h4>Company</h4>
         <a href="index.html#about">About Us</a>
+        <a href="/careers.html">Careers</a>
         <a href="/contact.html">Contact</a>
       </div>
       <div class="footer__col">
@@ -273,6 +328,31 @@
         <a href="/privacy.html">Privacy Policy</a>
         <a href="/terms.html">Terms &amp; Conditions</a>
       </div>
+    </div>
+    <!-- Store links. iOS is a TestFlight beta invite, not a public App Store
+         listing yet. Grep: data-todo="store-url" -->
+    <div class="footer__apps">
+      <span class="footer__apps-label">Get the app</span>
+      <div class="store-badges store-badges--footer store-badges--on-dark">
+        <div class="store-badges__item">
+          <a class="store-badge" data-todo="store-url"
+             href="https://testflight.apple.com/join/1yCPEdjU"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Join the Attira iOS beta on TestFlight">
+            <img src="/assets/badge-app-store.svg?v=1" width="168" height="60" alt="Download on the App Store" />
+          </a>
+          <span class="store-badge__tag">iOS beta · TestFlight</span>
+        </div>
+        <div class="store-badges__item">
+          <a class="store-badge" data-todo="store-url"
+             href="https://play.google.com/store/apps/details?id=com.tricore.attira"
+             target="_blank" rel="noopener noreferrer"
+             aria-label="Get Attira on Google Play">
+            <img src="/assets/badge-google-play.svg?v=1" width="168" height="60" alt="Get it on Google Play" />
+          </a>
+        </div>
+      </div>
+      <p class="footer__apps-legal">Apple and the Apple logo are trademarks of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC.</p>
     </div>
     <div class="footer__bottom">
       <span>© 2026 Attira. All rights reserved.</span>

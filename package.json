@@ -11,15 +11,21 @@
     "start": "node server.js",
     "dev": "node server.js",
     "export": "node export-emails.js",
-    "gen-webp": "node scripts/gen-webp.js"
+    "gen-webp": "node scripts/gen-webp.js",
+    "drive-auth": "node scripts/drive-auth.js",
+    "drive-sync": "node scripts/backfill-drive.js",
+    "test-drive": "node scripts/test-drive-mock.js"
   },
   "dependencies": {
+    "@google-cloud/storage": "^8.0.0",
     "@resvg/resvg-js": "^2.6.2",
     "better-sqlite3": "^11.3.0",
     "compression": "^1.7.4",
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
+    "google-auth-library": "^11.0.2",
     "helmet": "^7.1.0",
+    "multer": "^2.2.0",
     "posthog-node": "^5.21.2",
     "satori": "^0.12.1"
   },

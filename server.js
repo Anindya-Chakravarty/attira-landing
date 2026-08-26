@@ -13,7 +13,16 @@ const express = require("express");
 const compression = require("compression");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const multer = require("multer");
 const waitlist = require("./db");
+const careers = require("./careers-db");
+// The SAME module the browser loads for the careers form — so the form and
+// this API validate against one spec instead of two copies that drift.
+const roles = require("./careers-roles");
+// One definition of "an application as a row", shared with the Drive index.
+const xport = require("./careers-export");
+const uploads = require("./careers-uploads");
+const drive = require("./careers-drive");
 const og = require("./og");
 const { PostHog } = require("posthog-node");
 
@@ -74,7 +83,29 @@ app.use(
 /* ── Gzip/Brotli compression for text assets (html/css/js/json) ─── */
 app.use(compression());
 
-app.use(express.json({ limit: "16kb" }));
+/* 64kb, not 16kb. A completed designer application is ~16,000 bytes of
+   JSON in ASCII — already at the old ceiling — and every Devanagari
+   character costs 3 bytes, so an applicant writing in Hindi blew straight
+   past it at around 5,000 characters. The failure was silent and total:
+   express replies with an HTML 413, the client's res.json() throws, and the
+   applicant is told "network error" having lost every answer. */
+app.use(express.json({ limit: "64kb" }));
+
+/* Body-parser failures must come back as JSON, because that is what every
+   fetch() on this site does with the response. Mounted immediately after
+   the parser so it only sees parser errors. */
+app.use((err, req, res, next) => {
+  if (err && err.type === "entity.too.large") {
+    return res.status(413).json({
+      ok: false,
+      error: "That's a lot of text — please shorten your longer answers a little and resubmit.",
+    });
+  }
+  if (err && err.type === "entity.parse.failed") {
+    return res.status(400).json({ ok: false, error: "We couldn't read that submission. Please try again." });
+  }
+  return next(err);
+});
 
 /* ── Rate limit the signup endpoint (anti-spam) ─────────────────── */
 const signupLimiter = rateLimit({
@@ -89,6 +120,32 @@ const signupLimiter = rateLimit({
       properties: { endpoint: "/api/waitlist", ip: req.ip },
     });
     res.status(429).json({ error: "Too many requests. Please slow down and try again shortly." });
+  },
+});
+
+/* ── Rate limit job applications ─────────────────────────────────────
+   Tighter than signups (a genuine applicant submits once) but not so tight
+   that a shared IP locks people out: a campus lab or an office NAT can put
+   several real applicants behind one address, and rejected submissions
+   count toward the window too. Raised to 24 now that three roles are open:
+   one person may legitimately apply for two of them, and the intern posting
+   will draw student cohorts whose whole campus NATs to a single IP. Still
+   useless for bulk spam — the endpoint demands a dozen valid fields. */
+const applyLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 24,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler(req, res) {
+    posthog.capture({
+      distinctId: "anonymous",
+      event: "careers_rate_limited",
+      properties: { endpoint: "/api/careers/apply", ip: req.ip },
+    });
+    res.status(429).json({
+      ok: false,
+      error: "Too many applications from this connection. Please try again later.",
+    });
   },
 });
 
@@ -264,11 +321,10 @@ app.get("/api/waitlist/queue", (req, res) => {
 /* ── Admin: download all emails as CSV ──────────────────────────────
    Gated by the ADMIN_KEY env var. Send it as ?key=... in the URL or as
    an `Authorization: Bearer <key>` header. Disabled when ADMIN_KEY unset. */
-function csvEscape(v) {
-  if (v === null || v === undefined) return "";
-  const s = String(v);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
+/* Shared with the careers export and the Drive index — it also neutralises
+   formula-shaped cells, which matters the moment applicant-typed text is
+   opened in Excel or Sheets. */
+const csvEscape = xport.csvEscape;
 
 function adminKeyMatches(req) {
   if (!ADMIN_KEY) return false;
@@ -316,6 +372,346 @@ app.get("/api/waitlist/export", (req, res) => {
   res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader("Content-Disposition", 'attachment; filename="attira-waitlist.csv"');
   res.send(header + body + "\n");
+});
+
+/* ===================================================================
+   CAREERS — job application intake
+   Applications land in a separate SQLite file (careers-db.js). Files are
+   collected as LINKS in this pass (portfolio, artefacts, resume), so no
+   object storage or multipart middleware is needed.
+
+   Every question, option allowlist and format rule comes from
+   careers-roles.js — the SAME module the browser loads. The form and this
+   endpoint therefore reach identical verdicts by construction, instead of
+   by two hand-maintained copies that drift.
+   =================================================================== */
+
+function clampStr(v, max) {
+  if (typeof v !== "string") return "";
+  return v.trim().slice(0, max || 5000);
+}
+
+/* Compensation arrives as a plain integer string (the client strips
+   grouping separators). The cap rejects nonsense without second-guessing a
+   genuinely large number. Returns undefined for "invalid". */
+function parseComp(v) {
+  if (v === null || v === undefined || v === "") return null;
+  const n = typeof v === "number" ? v : parseInt(String(v).replace(/[^\d]/g, ""), 10);
+  if (!Number.isFinite(n) || n < 0 || n > 1e9) return undefined;
+  return n;
+}
+
+const CURRENCY_OPTIONS = new Set(roles.CURRENCIES.map((c) => c.value));
+
+/* Normalise one submitted value to the shape validateField() and the DB
+   expect. Never reads anything but the field the spec asked for. */
+function normalizeValue(field, raw, body) {
+  switch (field.type) {
+    case "linklist": {
+      const items = Array.isArray(raw) ? raw.slice(0, field.maxItems || roles.MAX_LINKS) : [];
+      return items.map((l) => clampStr(l, 500)).filter(Boolean);
+    }
+    case "tags": {
+      const picked = Array.isArray(raw) ? raw.slice(0, 30) : [];
+      const allowed = roles.optionValues(field);
+      return picked.map((t) => clampStr(t, 60)).filter((t) => allowed.indexOf(t) !== -1);
+    }
+    case "currency":
+      return String(raw == null ? "" : raw).replace(/[^\d]/g, "");
+    case "email":
+      return clampStr(raw, field.maxlength || 254).toLowerCase();
+    case "tel":
+      return roles.normalizePhone(clampStr(raw, 40));
+    case "url":
+      return clampStr(raw, 500);
+    /* The value of a file field is the opaque key /api/careers/upload
+       handed back. Anything that isn't one of our keys is dropped to
+       empty, so a crafted payload can't name an arbitrary object. */
+    case "file":
+      return uploads.isValidKey(raw) ? raw : "";
+    default:
+      return clampStr(raw, field.maxlength || 5000);
+  }
+}
+
+/* ── Resume upload ───────────────────────────────────────────────────
+   Files can't ride along in the apply payload (express.json caps the body
+   at 64kb), so the browser posts the file the moment it's chosen and gets
+   back an opaque key. The key is submitted with the rest of the answers
+   and collected later by careers-drive.js.
+
+   An unclaimed upload — someone who picks a file and never finishes — is
+   simply never referenced by a row, and the bucket's lifecycle rule
+   removes it. */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler(req, res) {
+    posthog.capture({
+      distinctId: "anonymous",
+      event: "careers_rate_limited",
+      properties: { endpoint: "/api/careers/upload", ip: req.ip },
+    });
+    res.status(429).json({ ok: false, error: "Too many uploads. Please wait a minute and try again." });
+  },
+});
+
+const uploadHandler = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_UPLOAD_BYTES, files: 1, fields: 4 },
+}).single("file");
+
+app.post("/api/careers/upload", uploadLimiter, (req, res) => {
+  uploadHandler(req, res, async (err) => {
+    if (err) {
+      const tooBig = err.code === "LIMIT_FILE_SIZE";
+      return res.status(tooBig ? 413 : 400).json({
+        ok: false,
+        error: tooBig
+          ? "That file is over 10MB — please upload a smaller PDF."
+          : "We couldn't read that upload. Please try again.",
+      });
+    }
+    if (!req.file || !req.file.buffer || !req.file.buffer.length) {
+      return res.status(400).json({ ok: false, error: "No file was received." });
+    }
+
+    // The browser's Content-Type is a claim; the magic bytes are evidence.
+    const sniffed = uploads.sniff(req.file.buffer);
+    if (!sniffed) {
+      return res.status(415).json({
+        ok: false,
+        error: "Please upload a PDF, Word document, or an image of your resume.",
+      });
+    }
+
+    try {
+      const key = await uploads.putStaged(req.file.buffer, {
+        contentType: sniffed.contentType,
+        originalName: req.file.originalname,
+      });
+      posthog.capture({
+        distinctId: "anonymous",
+        event: "career_resume_uploaded",
+        properties: { bytes: req.file.buffer.length, content_type: sniffed.contentType },
+      });
+      return res.json({
+        ok: true,
+        token: key,
+        filename: String(req.file.originalname || "resume").slice(0, 120),
+        bytes: req.file.buffer.length,
+      });
+    } catch (uploadErr) {
+      console.error("resume upload failed:", uploadErr);
+      posthog.captureException(uploadErr, undefined, { endpoint: "/api/careers/upload" });
+      return res.status(500).json({
+        ok: false,
+        error: "We couldn't store that file. You can paste a link to it instead.",
+      });
+    }
+  });
+});
+
+app.post("/api/careers/apply", applyLimiter, (req, res) => {
+  const b = req.body || {};
+  const fail = (error) => {
+    posthog.capture({
+      distinctId: "anonymous",
+      event: "career_application_invalid",
+      properties: { endpoint: "/api/careers/apply", reason: error },
+    });
+    return res.status(400).json({ ok: false, error });
+  };
+
+  const role = roles.findRole(typeof b.role === "string" ? b.role : "");
+  if (!role) return fail("That role isn't open.");
+
+  const submitted = (b.fields && typeof b.fields === "object") ? b.fields : {};
+  const answers = {};
+
+  /* Walk the SPEC, not the request body. A crafted key cannot enter because
+     nothing here ever reads Object.keys(submitted). showIf is evaluated
+     against the answers gathered so far, so a conditional question the
+     applicant never saw is not demanded of them — the same rule the form
+     applies on screen. */
+  for (const step of role.steps) {
+    for (const field of step.fields) {
+      if (typeof field.showIf === "function" && !field.showIf(answers)) continue;
+
+      const value = normalizeValue(field, submitted[field.name], submitted);
+      if (field.type === "tags") {
+        answers[field.name + "Other"] = clampStr(submitted[field.name + "Other"], 200);
+      }
+
+      const msg = roles.validateField(field, value, answers);
+      if (msg) return fail(msg);
+
+      answers[field.name] = value;
+    }
+  }
+
+  const compCurrency = CURRENCY_OPTIONS.has(b.fields && b.fields.compCurrency)
+    ? b.fields.compCurrency
+    : "INR";
+  const currentComp = parseComp(answers.currentComp);
+  const expectedComp = parseComp(answers.expectedComp);
+  if (currentComp === undefined || expectedComp === undefined) {
+    return fail("Please enter a valid compensation amount.");
+  }
+
+  const utm = sanitizeUtm(b.utm);
+
+  /* Columns the table holds directly; everything else in the spec goes to
+     the answers JSON blob. Derived from the spec, so a new role needs no
+     change here. */
+  const COMMON = new Set([
+    "fullName", "email", "phone", "location", "resumeUrl", "resumeFile",
+    "anythingElse", "currentComp", "expectedComp",
+  ]);
+  const roleAnswers = {};
+  for (const field of roles.fieldsFor(role.id)) {
+    if (COMMON.has(field.name)) continue;
+    if (!(field.name in answers)) continue;
+    roleAnswers[field.name] = answers[field.name];
+    if (field.type === "tags") roleAnswers[field.name + "Other"] = answers[field.name + "Other"];
+  }
+
+  try {
+    // Built from a fixed column list, never from Object.keys(req.body) — the
+    // client cannot introduce a column or overwrite one it shouldn't.
+    const result = careers.addApplication({
+      role: role.id,
+      full_name: answers.fullName,
+      email: answers.email,
+      phone: answers.phone || null,
+      location: answers.location || null,
+      resume_url: answers.resumeUrl || null,
+      current_comp: currentComp === null ? null : currentComp,
+      expected_comp: expectedComp === null ? null : expectedComp,
+      comp_currency: compCurrency,
+      anything_else: answers.anythingElse || null,
+      answers: JSON.stringify(roleAnswers),
+      user_agent: (req.get("user-agent") || "").slice(0, 255),
+      utm_source: utm.utm_source || null,
+      // normalizeValue has already rejected anything that isn't one of our
+      // staged upload keys.
+      file_keys: answers.resumeFile ? JSON.stringify([answers.resumeFile]) : null,
+    });
+
+    posthog.capture({
+      distinctId: answers.email,
+      event: "career_application_received",
+      properties: {
+        role: role.id,
+        ref: result.ref,
+        field_count: Object.keys(answers).length,
+        utm_source: utm.utm_source || null,
+      },
+    });
+    // Structured single-line log so a GCP log-based alert can notify on
+    // jsonPayload.event without any further code change.
+    console.log(JSON.stringify({
+      event: "career_application", ref: result.ref, role: role.id, email: answers.email,
+    }));
+
+    res.json({ ok: true, ref: result.ref });
+
+    /* Mirror to Drive AFTER the applicant has their reference — a Drive
+       outage must never turn into a failed submission. This kick is
+       best-effort: Cloud Run throttles CPU once the response is sent, so
+       the guaranteed path is the Cloud Scheduler call to
+       /api/careers/sync-drive, which runs inside a request. */
+    setImmediate(() => {
+      drive.syncPending({ limit: 5 }).catch((err) => {
+        console.error("[careers-drive] post-submit sync failed:", err.message);
+      });
+    });
+    return;
+  } catch (err) {
+    console.error("career application insert failed:", err);
+    posthog.captureException(err, undefined, { endpoint: "/api/careers/apply" });
+    return res.status(500).json({
+      ok: false,
+      error: "Something went wrong saving your application. Please try again in a moment.",
+    });
+  }
+});
+
+/* ── Admin: applications as CSV / JSON ──────────────────────────────
+   Same gate as the waitlist export — ADMIN_KEY via ?key= or a Bearer
+   header, 404 (not 403) when unset so the route is invisible. */
+
+app.get("/api/careers/export", (req, res) => {
+  if (!adminKeyMatches(req)) return res.status(404).end();
+
+  const roleId = typeof req.query.role === "string" && req.query.role ? req.query.role : null;
+  const role = roleId ? roles.findRole(roleId) : null;
+  // 400 rather than 404: adminKeyMatches already owns 404 for "not
+  // authorised", so reusing it here would be ambiguous.
+  if (roleId && !role) return res.status(400).json({ ok: false, error: "Unknown role." });
+
+  const rows = careers.exportAll(roleId);
+  posthog.capture({
+    distinctId: "admin",
+    event: "careers_export_accessed",
+    properties: { row_count: rows.length, role: roleId },
+  });
+
+  /* Role-filtered: one column per question, in the order they were asked,
+     so the CSV reads as a transcript of the form. Without a role: common
+     columns plus the raw blob, so nothing is unreachable in an export
+     whose rows answer different questions. Both shapes come from
+     careers-export.js, which the Drive index also uses. */
+  const csv = xport.toCsv(
+    xport.headerFor(roleId),
+    rows.map((r) => xport.rowFor(roleId, r))
+  );
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="attira-applications${roleId ? "-" + roleId : ""}.csv"`
+  );
+  // BOM: these exports contain ₹, en-dashes and curly quotes, all of which
+  // Excel mangles without it. (The waitlist export is left untouched.)
+  res.send("﻿" + csv);
+});
+
+/* ── Admin: drain the Drive mirror queue ─────────────────────────────
+   The reliable trigger. Cloud Scheduler POSTs here every 5 minutes with
+   the ADMIN_KEY bearer header; because the work happens inside a request,
+   Cloud Run guarantees CPU for it (outside a request it is throttled, so
+   a bare setInterval would stall). Safe to call by hand at any time —
+   syncPending() is idempotent and coalesces concurrent runs. */
+app.post("/api/careers/sync-drive", async (req, res) => {
+  if (!adminKeyMatches(req)) return res.status(404).end();
+  if (!drive.isConfigured()) {
+    return res.status(503).json({ ok: false, error: "DRIVE_OAUTH is not configured." });
+  }
+  const limit = Math.min(50, parseInt(req.query.limit, 10) || 20);
+  try {
+    const summary = await drive.syncPending({ limit });
+    return res.json({ ok: true, ...summary });
+  } catch (err) {
+    console.error("drive sync failed:", err);
+    posthog.captureException(err, undefined, { endpoint: "/api/careers/sync-drive" });
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.get("/api/careers/applications", (req, res) => {
+  if (!adminKeyMatches(req)) return res.status(404).end();
+  const roleId = typeof req.query.role === "string" && req.query.role ? req.query.role : null;
+  if (roleId && !roles.findRole(roleId)) {
+    return res.status(400).json({ ok: false, error: "Unknown role." });
+  }
+  const limit = parseInt(req.query.limit, 10) || 50;
+  const offset = parseInt(req.query.offset, 10) || 0;
+  res.json({ ok: true, ...careers.listApplications({ role: roleId, limit, offset }) });
 });
 
 /* ── HTML-escape helper for the unfurl page's interpolated values ── */
@@ -432,15 +828,32 @@ app.get("/", (req, res) => res.sendFile(path.join(STATIC_DIR, "index.html")));
 const server = app.listen(PORT, () => {
   console.log(`\nAttira site + waitlist running →  http://localhost:${PORT}`);
   console.log(`Emails are saved to: ${waitlist.DB_PATH}`);
+  console.log(`Applications are saved to: ${careers.DB_PATH}`);
   console.log(`Export anytime with:  npm run export\n`);
   if (!ADMIN_KEY) {
-    console.warn("[note] ADMIN_KEY not set — the /api/waitlist/export URL is disabled (use `npm run export`).");
+    console.warn("[note] ADMIN_KEY not set — the /api/waitlist/export and /api/careers/* admin URLs are disabled (use `npm run export`).");
+  }
+  if (drive.isConfigured()) {
+    console.log(`Applications also mirror to Google Drive → "${drive.ROOT_FOLDER_NAME}"`);
+  } else {
+    console.warn("[note] DRIVE_OAUTH not set — applications save normally but stay 'pending' for the Drive mirror.");
+  }
+  /* Loud, because the failure is silent otherwise: with no bucket, staged
+     resumes go to DATA_DIR, which on Cloud Run is an in-memory filesystem.
+     They'd count against the 512Mi limit and vanish on the next revision,
+     losing a file the applicant was already told we had. */
+  if (process.env.NODE_ENV === "production" && !uploads.usingGcs()) {
+    console.error(
+      "[WARNING] DRIVE_UPLOAD_BUCKET is not set. Uploaded resumes will be staged on the " +
+      "container's ephemeral filesystem and LOST on the next deploy. Set it to the GCS bucket."
+    );
   }
 });
 
 function shutdown() {
   server.close(async () => {
     try { waitlist._db.close(); } catch (_) {}
+    try { careers._db.close(); } catch (_) {}
     await posthog.shutdown();
     process.exit(0);
   });

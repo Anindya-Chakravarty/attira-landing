@@ -417,18 +417,6 @@ html[data-theme="dark"] .theme-toggle__icon--moon { opacity: 0; transform: rotat
   align-items: center;
   gap: 6px;
 }
-/* iOS links to a TestFlight beta, not a public App Store listing — say so under
-   the badge rather than letting the artwork imply general availability. */
-.store-badge__tag {
-  font-family: "Jost", sans-serif;
-  font-weight: 400;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--ink);
-  opacity: 0.6;
-}
 .store-badge {
   display: inline-flex;
   line-height: 0;
@@ -447,13 +435,6 @@ html[data-theme="dark"] .theme-toggle__icon--moon { opacity: 0; transform: rotat
 .store-badge:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(30, 29, 27, 0.32); }
 .store-badge:active { transform: translateY(0) scale(0.98); }
 .store-badge:focus-visible { outline-offset: 4px; }
-
-/* The badge artwork is black in both themes. On a dark surface that needs a
-   hairline to separate it from the background — Apple's prescribed treatment. */
-.store-badges--on-dark .store-badge { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.42); }
-.store-badges--on-dark .store-badge:hover {
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6), 0 10px 24px rgba(0, 0, 0, 0.5);
-}
 
 /* ----- hero row ----- */
 .store-badges--hero {
@@ -1382,6 +1363,10 @@ html[data-theme="dark"] .theme-slider {
 .footer__apps {
   max-width: var(--maxw);
   margin-inline: auto;
+  /* #get-app is the target of every "Get Access Now" CTA. It's a <div>, so the
+     `section { scroll-margin-top }` rule doesn't match it — restate it here or
+     the sticky 95px nav covers the badges on arrival. */
+  scroll-margin-top: 95px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1408,9 +1393,63 @@ html[data-theme="dark"] .theme-slider {
   color: #fff;
   opacity: 0.45;
 }
-.store-badges--footer { --store-badge-h: 40px; }
-/* footer is var(--dark) in both themes, so the caption is light unconditionally */
-.store-badges--footer .store-badge__tag { color: #fff; opacity: 0.5; }
+/* ----- footer download buttons -----
+   The footer uses direct-link pills rather than the official store badges (those
+   live in the hero). Two equal buttons, one per platform, so a visitor picks in
+   a single click. Footer is var(--dark) in both themes, so this needs no
+   dark-mode counterpart. */
+.app-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 24px 11px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  text-decoration: none;
+  transition: transform var(--dur-fast) var(--ease-spring),
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.app-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.app-btn:active { transform: translateY(0) scale(0.98); }
+.app-btn:focus-visible { outline-offset: 4px; }
+
+.app-btn__icon { display: flex; align-items: center; }
+.app-btn__icon svg { display: block; width: auto; }
+/* sized off height, not width: the Apple mark is portrait, the Play mark is
+   near-square, so matching heights is what makes them look equal */
+.app-btn__icon--play svg  { height: 21px; }
+.app-btn__icon--apple svg { height: 23px; margin-top: -2px; }  /* optical centring */
+
+.app-btn__text {
+  display: flex;
+  flex-direction: column;
+  font-family: "Jost", sans-serif;
+  line-height: 1.2;
+}
+.app-btn__eyebrow {
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+.app-btn__name {
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+}
 
 .footer__bottom {
   max-width: var(--maxw);
@@ -1663,6 +1702,7 @@ html[data-theme="dark"] .theme-slider {
     text-align: center;
     gap: 16px;
     padding: 24px 0 22px;
+    scroll-margin-top: 64px;   /* matches the mobile `section` offset */
   }
   .footer__bottom {
     flex-direction: column;
@@ -1692,7 +1732,8 @@ html[data-theme="dark"] .theme-slider {
   /* reveals are never hidden (JS doesn't add `js-reveal` under reduced motion),
      but neutralise the remaining state transitions so nothing eases */
   .nav { transition: none; }
-  .nav__cta, .hero__cta, .waitlist__submit, .contact__submit, .store-badge { transition: none; }
+  .nav__cta, .hero__cta, .waitlist__submit, .contact__submit,
+  .store-badge, .app-btn { transition: none; }
 }
 
 /* ===================== LEGAL / CONTENT PAGES ===================== */
@@ -2014,8 +2055,7 @@ html[data-theme="dark"] .store-badges--hero .store-badge {
 html[data-theme="dark"] .store-badges--hero .store-badge:hover {
   box-shadow: 0 0 0 1px rgba(240, 235, 227, 0.62), 0 10px 24px rgba(0, 0, 0, 0.55);
 }
-html[data-theme="dark"] .store-badges__note,
-html[data-theme="dark"] .store-badges--hero .store-badge__tag { color: #d9d2c7; }
+html[data-theme="dark"] .store-badges__note { color: #d9d2c7; }
 
 /* ----- about ----- */
 html[data-theme="dark"] .about__title,
@@ -2364,6 +2404,54 @@ html[data-theme="dark"] .contact__aside-note { color: #b8b0a6; }
   border-color: var(--orange);
 }
 
+/* resume upload — the native control, restyled only where it helps.
+   The file button itself stays the platform's own: an in-app browser on
+   iOS renders it as the sheet people already recognise, and replacing it
+   with a custom target is how uploads quietly stop working there. */
+.apply__file {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px dashed rgba(61, 54, 50, 0.28);
+  border-radius: 12px;
+  background: #fff;
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.apply__file::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--orange);
+  font-family: inherit;
+  font-size: 13px;
+  color: #fff;
+  cursor: pointer;
+}
+.apply__file[aria-invalid="true"] { border-color: var(--orange); }
+.apply__file-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  color: #4f4842;
+}
+.apply__file-status[hidden] { display: none; }
+.apply__file-remove {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--orange);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* tag / multi-select chips */
 .apply__tags {
   display: flex;
@@ -2694,6 +2782,12 @@ html[data-theme="dark"] .apply__progress-count,
 html[data-theme="dark"] .apply__review-label,
 html[data-theme="dark"] .apply__done-note { color: #b8b0a6 !important; }
 html[data-theme="dark"] .apply__progress { background: rgba(240, 235, 227, 0.12); }
+html[data-theme="dark"] .apply__file {
+  background: rgba(240, 235, 227, 0.06);
+  border-color: rgba(240, 235, 227, 0.28);
+  color: #f0ebe3;
+}
+html[data-theme="dark"] .apply__file-status { color: #b8b0a6 !important; }
 html[data-theme="dark"] .apply__tag,
 html[data-theme="dark"] .apply__tag-input,
 html[data-theme="dark"] .apply__link-input,

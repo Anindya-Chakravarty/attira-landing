@@ -16,3 +16,17 @@ dbs:
         # Keep at least 24h of WAL snapshots for point-in-time recovery.
         retention: 24h
         snapshot-interval: 1h
+
+  # Job applications (/careers). Separate file from the waitlist so applicant
+  # PII has its own replica and its own retention. Writes are rare and each
+  # one matters, so retention is longer and snapshots less frequent.
+  # NOTE: docker-entrypoint.sh must restore this file too — without the
+  # matching `litestream restore` line the table silently starts empty after
+  # every deploy.
+  - path: /data/careers.db
+    replicas:
+      - type: gcs
+        bucket: ${LITESTREAM_GCS_BUCKET}
+        path: careers.db
+        retention: 72h
+        snapshot-interval: 24h

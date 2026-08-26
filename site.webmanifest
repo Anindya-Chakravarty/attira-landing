@@ -1,0 +1,26 @@
+{
+  "name": "Attira — AI Personal Stylist",
+  "short_name": "Attira",
+  "description": "Attira turns your wardrobe into a catalogue of possibilities — rediscover outfits from pieces you already own with an AI personal stylist.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffce8",
+  "theme_color": "#fffce8",
+  "lang": "en",
+  "categories": ["lifestyle", "shopping"],
+  "icons": [
+    {
+      "src": "/assets/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "any maskable"
+    }
+  ]
+}

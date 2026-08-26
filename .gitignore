@@ -8,6 +8,7 @@ data/
 *.xlsx
 *.docx
 *.heic
+applications/
 
 # stray pasted screenshots
 Screenshot*.png
@@ -15,3 +16,4 @@ Screenshot*.png
 # local agent tooling / config
 .claude/
 .mcp.json
+.playwright-mcp/

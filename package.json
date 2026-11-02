@@ -14,7 +14,8 @@
     "gen-webp": "node scripts/gen-webp.js",
     "drive-auth": "node scripts/drive-auth.js",
     "drive-sync": "node scripts/backfill-drive.js",
-    "test-drive": "node scripts/test-drive-mock.js"
+    "test-drive": "node scripts/test-drive-mock.js",
+    "test": "node --test creator-program.test.js"
   },
   "dependencies": {
     "@google-cloud/storage": "^8.0.0",

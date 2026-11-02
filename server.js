@@ -24,6 +24,7 @@ const xport = require("./careers-export");
 const uploads = require("./careers-uploads");
 const drive = require("./careers-drive");
 const og = require("./og");
+const creatorProgram = require("./creator-program");
 const { PostHog } = require("posthog-node");
 
 const posthog = new PostHog(process.env.POSTHOG_API_KEY, {
@@ -37,6 +38,8 @@ const STATIC_DIR = __dirname;
 // tags and share-card images, which must point at attira.org regardless of
 // the internal Cloud Run host the request actually lands on.
 const PUBLIC_ORIGIN = (process.env.PUBLIC_ORIGIN || "https://attira.org").replace(/\/+$/, "");
+const ATTIRA_API_URL = (process.env.ATTIRA_API_URL || "").replace(/\/+$/, "");
+const ATTIRA_WEB_URL = (process.env.ATTIRA_WEB_URL || PUBLIC_ORIGIN).replace(/\/+$/, "");
 // Optional secret that protects the CSV export endpoint. If unset, the
 // HTTP export route is disabled (you can still run `npm run export`).
 const ADMIN_KEY = process.env.ADMIN_KEY || "";
@@ -58,12 +61,24 @@ app.use(
       useDefaults: true,
       directives: {
         "default-src": ["'self'"],
-        "script-src": ["'self'", "https://us-assets.i.posthog.com"],
+        "script-src": ["'self'", "https://us-assets.i.posthog.com", "https://www.gstatic.com", "https://apis.google.com"],
         "style-src": ["'self'", "https://fonts.googleapis.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com"],
         "img-src": ["'self'", "data:"],
         // PostHog: load array.js from the asset CDN, send events to the API host.
-        "connect-src": ["'self'", "https://us.i.posthog.com", "https://us-assets.i.posthog.com"],
+        "connect-src": [
+          "'self'",
+          "https://us.i.posthog.com",
+          "https://us-assets.i.posthog.com",
+          "https://identitytoolkit.googleapis.com",
+          "https://securetoken.googleapis.com",
+          "https://accounts.google.com",
+          ...(ATTIRA_API_URL ? [ATTIRA_API_URL] : []),
+        ],
+        // Firebase routes the OAuth handler through <project>.firebaseapp.com.
+        // The wildcard covers dev and prod projects; FIREBASE_AUTH_DOMAIN is
+        // the one actually used (ootfits-dev-jod / ootfits-prod-jod).
+        "frame-src": ["https://*.firebaseapp.com", "https://accounts.google.com"],
         // posthog-js spins up a web worker from a blob: URL for batching.
         "worker-src": ["'self'", "blob:"],
         // contact.html submits via action="mailto:…", so allow the mailto scheme.
@@ -77,6 +92,9 @@ app.use(
     // HSTS is only meaningful over HTTPS; enable when deployed behind TLS.
     hsts: false,
     crossOriginEmbedderPolicy: false,
+    // Firebase signInWithPopup needs the popup to reach window.opener.
+    // Helmet's default of same-origin severs that and the sign-in hangs.
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
   })
 );
 
@@ -802,6 +820,16 @@ app.get("/r/:code", (req, res) => {
 </body>
 </html>`);
 });
+
+/* ── Creator referral program ─────────────────────────────────────
+   Serves /api/creator/config and the /invite/:code click shell. Creator
+   identity, codes, metrics and earnings live in the Attira API, which the
+   dashboard calls from the browser with a Firebase ID token. */
+app.use(creatorProgram.router);
+
+/* No admin surface lives here. Referral administration is served by the
+   Attira API under /api/v1/admin/referrals/*, gated on an app user whose
+   role is 'admin' — a different trust domain from this marketing site. */
 
 /* ── Static landing site (index.html, legal pages, assets, …) ───── */
 app.use(

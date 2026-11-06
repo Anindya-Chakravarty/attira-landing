@@ -1,0 +1,17 @@
+{
+  "name": "attira-referral-links",
+  "main": "referral-worker.mjs",
+  "compatibility_date": "2026-11-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true, "head_sampling_rate": 1, "logs": { "enabled": true, "invocation_logs": false } },
+  "build": { "command": "node cloudflare/build-assets.cjs", "cwd": "." },
+  "assets": { "directory": "./assets", "binding": "ASSETS", "run_worker_first": true },
+  "routes": [
+    { "pattern": "attira.org/invite/*", "zone_name": "attira.org" },
+    { "pattern": "attira.org/invite.js*", "zone_name": "attira.org" },
+    { "pattern": "attira.org/referral/open*", "zone_name": "attira.org" },
+    { "pattern": "attira.org/.well-known/apple-app-site-association*", "zone_name": "attira.org" }
+  ]
+}

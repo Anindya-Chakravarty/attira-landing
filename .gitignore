@@ -17,3 +17,7 @@ Screenshot*.png
 .claude/
 .mcp.json
 .playwright-mcp/
+
+# Isolated referral edge build output.
+cloudflare/assets/
+.wrangler/

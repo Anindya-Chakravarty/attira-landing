@@ -15,7 +15,7 @@
     "drive-auth": "node scripts/drive-auth.js",
     "drive-sync": "node scripts/backfill-drive.js",
     "test-drive": "node scripts/test-drive-mock.js",
-    "test": "node --test creator-program.test.js"
+    "test": "node --test creator-program.test.js cloudflare/referral-worker.test.mjs"
   },
   "dependencies": {
     "@google-cloud/storage": "^8.0.0",
